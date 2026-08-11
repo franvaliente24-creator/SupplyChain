@@ -1,0 +1,22 @@
+{
+  "name": "SupplyChain Management",
+  "short_name": "SupplyChain",
+  "description": "Supply Chain Management System",
+  "start_url": "/module.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='48' fill='%23f1f5f9'/%3E%3Cpath d='M60 96a18 18 0 1 1 0-36 18 18 0 0 1 0 36zm72 36H60l24-30 15 18 12-15 21 27z' fill='%23cbd5e1'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%23f1f5f9'/%3E%3Cpath d='M160 256a48 48 0 1 1 0-96 48 48 0 0 1 0 96zm192 96H160l64-80 40 48 32-40 56 72z' fill='%23cbd5e1'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

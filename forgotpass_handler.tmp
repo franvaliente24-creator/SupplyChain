@@ -1,0 +1,71 @@
+    document.getElementById('forgot-password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+
+        if (!email) {
+            alert('Please enter your email address.');
+            return;
+        }
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalHTML = submitBtn ? submitBtn.innerHTML : null;
+        const restoreBtn = () => {
+            if (!submitBtn) return;
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.innerHTML = originalHTML;
+        };
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.8';
+            submitBtn.innerHTML = '<span>Sending reset link...</span>';
+        }
+
+        try {
+            const response = await fetch('reset_info.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const contentType = response.headers.get('content-type') || '';
+            let data = {};
+            if (contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const raw = await response.text();
+                const jsonStart = raw.indexOf('{');
+                const jsonEnd = raw.lastIndexOf('}');
+                if (jsonStart !== -1 && jsonEnd !== -1) {
+                    try { data = JSON.parse(raw.slice(jsonStart, jsonEnd + 1)); }
+                    catch (_) { data = { message: raw.slice(0, 160) }; }
+                } else {
+                    data = { message: raw.slice(0, 160) || 'Unexpected server response.' };
+                }
+            }
+
+            if (response.ok) {
+                let message = data.message || 'If that email exists, a reset link has been generated.';
+                if (data.reset_url) {
+                    const devMsg = `\n\n[Development] Reset link: ${data.reset_url}`;
+                    try {
+                        await navigator.clipboard.writeText(data.reset_url);
+                        message += devMsg + '\n(Copied to clipboard)';
+                    } catch (_) {
+                        message += devMsg;
+                    }
+                }
+                alert(message);
+                restoreBtn();
+            } else {
+                alert(data.message || 'Failed to send reset link. Please try again.');
+                restoreBtn();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Unable to reach the server. Make sure XAMPP Apache and MySQL are running, then try again.');
+            restoreBtn();
+        }
+    });
