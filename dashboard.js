@@ -186,12 +186,47 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebarSubsystemModulesNav.innerHTML = subsystem.modules.map((module) => {
         const mod = normalizeModule(module);
         const isActive = activeModuleId === mod.id;
-        return `
-            <a href="${getModuleHref(subsystemId, mod.id)}" class="sidebar-subsystem-link ${isActive ? 'active' : ''}">
-                <span class="material-symbols-outlined sidebar-subsystem-link-icon">${getModuleIcon(mod.name)}</span>
-                <span class="truncate">${mod.name}</span>
-            </a>
-        `;
+        const hasSubnav = mod.subnav && mod.subnav.length > 0;
+        
+        if (hasSubnav) {
+            // Module with submenu
+            const isModuleOpen = isActive;
+            const defaultViewId = mod.subnav[0]?.id;
+            
+            return `
+                <div class="sidebar-module-group ${isModuleOpen ? 'open' : ''}" data-module-id="${mod.id}">
+                    <button type="button" class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" data-module="${mod.id}">
+                        <span class="sidebar-subsystem-link-icon">
+                            <span class="material-symbols-outlined">${getModuleIcon(mod.name)}</span>
+                        </span>
+                        <span class="truncate flex-1 text-left">${mod.name}</span>
+                        <span class="material-symbols-outlined sidebar-chevron text-base">expand_more</span>
+                    </button>
+                    <div class="sidebar-submenu" data-submenu-for="${mod.id}">
+                        ${mod.subnav.map(sub => {
+                            const isSubActive = sub.id === defaultViewId;
+                            return `
+                                <a href="${getModuleHref(subsystemId, mod.id)}&view=${sub.id}" 
+                                   class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
+                                   data-view="${sub.id}"
+                                   data-render="${sub.render}">
+                                    <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
+                                    <span class="truncate">${sub.label}</span>
+                                </a>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        } else {
+            // Plain module link (no submenu)
+            return `
+                <a href="${getModuleHref(subsystemId, mod.id)}" class="sidebar-subsystem-link ${isActive ? 'active' : ''}">
+                    <span class="material-symbols-outlined sidebar-subsystem-link-icon">${getModuleIcon(mod.name)}</span>
+                    <span class="truncate">${mod.name}</span>
+                </a>
+            `;
+        }
     }).join('');
     sidebarSubsystemNavPanel.classList.remove('hidden');
 

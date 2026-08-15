@@ -201,7 +201,12 @@ const SUBSYSTEMS = [
             {
                 id: 'sws',
                 name: 'Smart Warehousing System (SWS)',
-                
+                subnav: [
+                    { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', render: 'renderSWSWorkspace' },
+                    { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', render: 'renderSWSBinLookup' },
+                    { id: 'task-queues', label: 'Task Queues', icon: 'assignment', render: 'renderSWSTaskQueues' },
+                    { id: 'cycle-count', label: 'Cycle Count', icon: 'fact_check', render: 'renderSWSCycleCount' }
+                ],
                 functions: [
                     { name: 'generateAssetQR', description: 'Generates a printable QR code for an asset/bin/locker.' },
                     { name: 'scanAssetQR', description: 'Looks up an asset by scanned QR code and returns its current zone/location.' },
@@ -212,6 +217,13 @@ const SUBSYSTEMS = [
             {
                 id: 'ims',
                 name: 'Inventory Management System (IMS)',
+                subnav: [
+                    { id: 'item-master', label: 'Item Master', icon: 'inventory', render: 'renderIMSWorkspace' },
+                    { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', render: 'renderIMSStockLevels' },
+                    { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', render: 'renderIMSUtilizationOverview' },
+                    { id: 'adjustments', label: 'Adjustments', icon: 'tune', render: 'renderIMSAdjustmentWorkflow' },
+                    { id: 'asset-disposition', label: 'Asset Disposition', icon: 'sync_alt', render: 'renderIMSAvailable' }
+                ],
                 functions: [
                     { name: 'checkReorderAlerts', description: 'Returns items below reorder threshold for restocking.' },
                     { name: 'adjustStockCount', description: 'Updates stock quantity with reason and timestamp.' },
@@ -222,6 +234,12 @@ const SUBSYSTEMS = [
             {
                 id: 'psm',
                 name: 'Procurement & Sourcing Management (PSM)',
+                subnav: [
+                    { id: 'requisitions', label: 'Requisitions', icon: 'description', render: 'renderPSMWorkspace' },
+                    { id: 'rfqs', label: 'RFQs', icon: 'request_quote', render: 'renderPSMRFQ' },
+                    { id: 'sourcing', label: 'Sourcing', icon: 'handshake', render: 'renderPSMSourcingPipeline' },
+                    { id: 'spend', label: 'Spend', icon: 'payments', render: 'renderPSMSpendAnalytics' }
+                ],
                 functions: [
                     { name: 'checkBudgetAllocation', description: 'Checks if requested amount is within available budget.' },
                     { name: 'compareVendorQuotes', description: 'Compares price and lead time from multiple vendors.' },
@@ -413,6 +431,7 @@ function normalizeModule(module) {
         const id = module.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         return { id, name: module, description: '', features: [] };
     }
+    // Preserve subnav property if it exists
     return module;
 }
 

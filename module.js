@@ -27,17 +27,57 @@ function renderModulePage() {
         sidebarDashboardLink.classList.remove('active');
     }
 
+    // Get current view from URL params
+    const params = new URLSearchParams(window.location.search);
+    const currentView = params.get('view');
+
     // Render module links with correct active state
     if (sidebarSubsystemModulesNav && subsystem.modules) {
         sidebarSubsystemModulesNav.innerHTML = subsystem.modules.map((entry) => {
             const mod = normalizeModule(entry);
             const isActive = mod.id === moduleId;
-            return `
-                <a href="${getModuleHref(subsystemId, mod.id)}" class="sidebar-subsystem-link ${isActive ? 'active' : ''}">
-                    <span class="material-symbols-outlined sidebar-subsystem-link-icon">${getModuleIcon(mod.name)}</span>
-                    <span class="truncate">${mod.name}</span>
-                </a>
-            `;
+            const hasSubnav = mod.subnav && mod.subnav.length > 0;
+            
+            if (hasSubnav) {
+                // Module with submenu
+                const isModuleOpen = isActive;
+                const activeSubItemId = isActive ? currentView : null;
+                const defaultViewId = mod.subnav[0]?.id;
+                
+                return `
+                    <div class="sidebar-module-group ${isModuleOpen ? 'open' : ''}" data-module-id="${mod.id}">
+                        <button type="button" class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" data-module="${mod.id}">
+                            <span class="sidebar-subsystem-link-icon">
+                                <span class="material-symbols-outlined">${getModuleIcon(mod.name)}</span>
+                            </span>
+                            <span class="truncate flex-1 text-left">${mod.name}</span>
+                            <span class="material-symbols-outlined sidebar-chevron text-base">expand_more</span>
+                        </button>
+                        <div class="sidebar-submenu" data-submenu-for="${mod.id}">
+                            ${mod.subnav.map(sub => {
+                                const isSubActive = activeSubItemId === sub.id || (!activeSubItemId && sub.id === defaultViewId);
+                                return `
+                                    <a href="${getModuleHref(subsystemId, mod.id)}&view=${sub.id}" 
+                                       class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
+                                       data-view="${sub.id}"
+                                       data-render="${sub.render}">
+                                        <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
+                                        <span class="truncate">${sub.label}</span>
+                                    </a>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Plain module link (no submenu)
+                return `
+                    <a href="${getModuleHref(subsystemId, mod.id)}" class="sidebar-subsystem-link ${isActive ? 'active' : ''}">
+                        <span class="material-symbols-outlined sidebar-subsystem-link-icon">${getModuleIcon(mod.name)}</span>
+                        <span class="truncate">${mod.name}</span>
+                    </a>
+                `;
+            }
         }).join('');
     }
     if (sidebarSubsystemNavPanel) sidebarSubsystemNavPanel.classList.remove('hidden');
@@ -128,7 +168,10 @@ function renderModulePage() {
     wireQuickActionButtons(moduleId);
 }
 
-document.addEventListener('DOMContentLoaded', renderModulePage);
+document.addEventListener('DOMContentLoaded', () => {
+    renderModulePage();
+    initSidebarSubmenus();
+});
 
 function wireQuickActionButtons(moduleId) {
     const workspaceBtn = document.getElementById('quick-action-workspace');
@@ -218,6 +261,177 @@ function wireQuickActionButtons(moduleId) {
     }
 }
 
+function initSidebarSubmenus() {
+    // Handle module toggle clicks (accordion behavior)
+    document.querySelectorAll('.sidebar-module-toggle').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const group = toggle.closest('.sidebar-module-group');
+            if (group) {
+                group.classList.toggle('open');
+            }
+        });
+    });
+
+    // Handle submenu link clicks
+    document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // Update active state for all submenu items in the same group
+            const submenu = link.closest('.sidebar-submenu');
+            if (submenu) {
+                submenu.querySelectorAll('.sidebar-submenu-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+
+            // Get render function from data attribute and call it
+            const renderFunc = link.dataset.render;
+            if (renderFunc && window[renderFunc]) {
+                e.preventDefault();
+                // Update URL without full page reload
+                const url = new URL(window.location);
+                url.searchParams.set('view', link.dataset.view);
+                window.history.pushState({}, '', url);
+                
+                // Call the render function
+                window[renderFunc]();
+            }
+        });
+    });
+
+    // Handle collapsed sidebar flyout
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        document.querySelectorAll('.sidebar-module-group').forEach(group => {
+            const toggle = group.querySelector('.sidebar-module-toggle');
+            const moduleId = group.dataset.moduleId;
+            
+            // Create flyout menu
+            const flyout = document.createElement('div');
+            flyout.className = 'sidebar-flyout-menu';
+            flyout.id = `flyout-${moduleId}`;
+            
+            // Get module name and subnav items
+            const subsystem = getSubsystemById(getSubsystemFromUrl());
+            let moduleName = '';
+            let subnavItems = [];
+            
+            if (subsystem && subsystem.modules) {
+                const mod = subsystem.modules.find(m => normalizeModule(m).id === moduleId);
+                if (mod) {
+                    moduleName = mod.name;
+                    subnavItems = mod.subnav || [];
+                }
+            }
+            
+            // Build flyout content
+            flyout.innerHTML = `
+                <div class="sidebar-flyout-header">${moduleName}</div>
+                ${subnavItems.map(sub => `
+                    <a href="${getModuleHref(getSubsystemFromUrl(), moduleId)}&view=${sub.id}" 
+                       class="sidebar-flyout-item ${sub.id === new URLSearchParams(window.location.search).get('view') ? 'active' : ''}"
+                       data-view="${sub.id}"
+                       data-render="${sub.render}">
+                        <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
+                        <span>${sub.label}</span>
+                    </a>
+                `).join('')}
+            `;
+            
+            group.appendChild(flyout);
+            
+            // Show flyout on hover when sidebar is collapsed
+            toggle.addEventListener('mouseenter', () => {
+                if (sidebar.classList.contains('w-20')) {
+                    const rect = toggle.getBoundingClientRect();
+                    flyout.style.top = `${rect.top}px`;
+                    flyout.classList.add('visible');
+                }
+            });
+            
+            // Hide flyout on mouseleave
+            group.addEventListener('mouseleave', () => {
+                flyout.classList.remove('visible');
+            });
+            
+            // Handle flyout item clicks
+            flyout.querySelectorAll('.sidebar-flyout-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const renderFunc = item.dataset.render;
+                    if (renderFunc && window[renderFunc]) {
+                        e.preventDefault();
+                        // Update URL
+                        const url = new URL(window.location);
+                        url.searchParams.set('view', item.dataset.view);
+                        window.history.pushState({}, '', url);
+                        
+                        // Call render function
+                        window[renderFunc]();
+                        
+                        // Hide flyout
+                        flyout.classList.remove('visible');
+                    }
+                });
+            });
+        });
+    }
+
+    // On page load, check URL params and call appropriate render function
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const module = params.get('module');
+
+    if (view && module) {
+        // Find the corresponding render function from subsystem data
+        const subsystem = getSubsystemById(params.get('subsystem'));
+        if (subsystem && subsystem.modules) {
+            const mod = subsystem.modules.find(m => normalizeModule(m).id === module);
+            if (mod && mod.subnav) {
+                const subItem = mod.subnav.find(s => s.id === view);
+                if (subItem && subItem.render && window[subItem.render]) {
+                    // Call the render function after a short delay to ensure DOM is ready
+                    setTimeout(() => window[subItem.render](), 100);
+                }
+            }
+        }
+    }
+}
+
+function syncSidebarWithView(renderFuncName) {
+    // Find which subnav item corresponds to this render function
+    const params = new URLSearchParams(window.location.search);
+    const module = params.get('module');
+    const subsystem = getSubsystemById(params.get('subsystem'));
+    
+    if (subsystem && subsystem.modules) {
+        const mod = subsystem.modules.find(m => normalizeModule(m).id === module);
+        if (mod && mod.subnav) {
+            const subItem = mod.subnav.find(s => s.render === renderFuncName);
+            if (subItem) {
+                // Update URL
+                const url = new URL(window.location);
+                url.searchParams.set('view', subItem.id);
+                window.history.pushState({}, '', url);
+                
+                // Update sidebar active states
+                document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.view === subItem.id) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // Update flyout active states
+                document.querySelectorAll('.sidebar-flyout-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.view === subItem.id) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        }
+    }
+}
+
 // Render functions for each module
 function renderSWSWorkspace() {
     const titleEl = document.getElementById('data-view-title');
@@ -233,6 +447,8 @@ function renderSWSWorkspace() {
             <button onclick="renderSWSCycleCount()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Cycle Count</button>
         `;
     }
+    
+    syncSidebarWithView('renderSWSWorkspace');
     
     if (contentEl) {
         const zones = getWarehouseCapacity();
@@ -367,6 +583,8 @@ function renderSWSBinLookup() {
         `;
     }
     
+    syncSidebarWithView('renderSWSBinLookup');
+    
     if (contentEl) {
         const mockBins = [
             { bin: 'A-12-03', asset: 'Laptop Dell XPS 15', status: 'Ready for Dispatch', lastScan: '2026-08-08 14:30' },
@@ -480,6 +698,8 @@ function renderSWSTaskQueues() {
         `;
     }
     
+    syncSidebarWithView('renderSWSTaskQueues');
+    
     if (contentEl) {
         const mockTasks = [
             { id: 'TASK-001', type: 'Putaway', priority: 'High', asset: 'Laptop Dell XPS 15', targetBin: 'A-12-05', assignedTo: 'John D.' },
@@ -574,6 +794,8 @@ function renderSWSCycleCount() {
             <button onclick="renderSWSCycleCount()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Cycle Count</button>
         `;
     }
+    
+    syncSidebarWithView('renderSWSCycleCount');
     
     if (contentEl) {
         const mockSchedule = [
@@ -805,7 +1027,7 @@ function renderIMSWorkspace() {
         filtersEl.innerHTML = `
             <button onclick="renderIMSWorkspace()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Item Master</button>
             <button onclick="renderIMSStockLevels()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Stock Levels</button>
-            <button onclick="renderIMSABCAnalysis()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
+            <button onclick="renderIMSUtilizationOverview()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
             <button onclick="renderIMSAdjustmentWorkflow()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Adjustments</button>
             <div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
             <button onclick="renderIMSReceived()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Received</button>
@@ -815,6 +1037,8 @@ function renderIMSWorkspace() {
             <button onclick="renderIMSDisposal()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Disposal</button>
         `;
     }
+    
+    syncSidebarWithView('renderIMSWorkspace');
     
     if (contentEl) {
         const mockItems = [
@@ -908,7 +1132,7 @@ function renderIMSStockLevels() {
         filtersEl.innerHTML = `
             <button onclick="renderIMSWorkspace()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Item Master</button>
             <button onclick="renderIMSStockLevels()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Stock Levels</button>
-            <button onclick="renderIMSABCAnalysis()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
+            <button onclick="renderIMSUtilizationOverview()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
             <button onclick="renderIMSAdjustmentWorkflow()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Adjustments</button>
             <div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
             <button onclick="renderIMSReceived()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Received</button>
@@ -918,6 +1142,8 @@ function renderIMSStockLevels() {
             <button onclick="renderIMSDisposal()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Disposal</button>
         `;
     }
+    
+    syncSidebarWithView('renderIMSStockLevels');
     
     if (contentEl) {
         const mockStock = [
@@ -1037,7 +1263,7 @@ function confirmTransfer(assetId, assetName, currentZone) {
     }, 500);
 }
 
-function renderIMSABCAnalysis() {
+function renderIMSUtilizationOverview() {
     const titleEl = document.getElementById('data-view-title');
     const contentEl = document.getElementById('data-view-content');
     const filtersEl = document.getElementById('data-view-filters');
@@ -1047,7 +1273,7 @@ function renderIMSABCAnalysis() {
         filtersEl.innerHTML = `
             <button onclick="renderIMSWorkspace()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Item Master</button>
             <button onclick="renderIMSStockLevels()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Stock Levels</button>
-            <button onclick="renderIMSABCAnalysis()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Utilization Overview</button>
+            <button onclick="renderIMSUtilizationOverview()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Utilization Overview</button>
             <button onclick="renderIMSAdjustmentWorkflow()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Adjustments</button>
             <div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
             <button onclick="renderIMSReceived()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Received</button>
@@ -1057,6 +1283,8 @@ function renderIMSABCAnalysis() {
             <button onclick="renderIMSDisposal()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Disposal</button>
         `;
     }
+    
+    syncSidebarWithView('renderIMSUtilizationOverview');
     
     if (contentEl) {
         const mockUtilization = [
@@ -1128,7 +1356,7 @@ function renderIMSAdjustmentWorkflow() {
         filtersEl.innerHTML = `
             <button onclick="renderIMSWorkspace()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Item Master</button>
             <button onclick="renderIMSStockLevels()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Stock Levels</button>
-            <button onclick="renderIMSABCAnalysis()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
+            <button onclick="renderIMSUtilizationOverview()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Utilization Overview</button>
             <button onclick="renderIMSAdjustmentWorkflow()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Adjustments</button>
             <div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
             <button onclick="renderIMSReceived()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Received</button>
@@ -1138,6 +1366,8 @@ function renderIMSAdjustmentWorkflow() {
             <button onclick="renderIMSDisposal()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Disposal</button>
         `;
     }
+    
+    syncSidebarWithView('renderIMSAdjustmentWorkflow');
     
     if (contentEl) {
         const mockAdjustments = [
@@ -1649,6 +1879,8 @@ function renderPSMWorkspace() {
         `;
     }
     
+    syncSidebarWithView('renderPSMWorkspace');
+    
     if (contentEl) {
         const mockReqs = [
             { id: 'REQ-2026-016', item: 'Laptop Dell XPS 15', requestor: 'HR Dept', amount: 25000, budgetCheck: 'Pass', status: 'Pending Approval' },
@@ -1717,6 +1949,8 @@ function renderPSMRFQ() {
         `;
     }
     
+    syncSidebarWithView('renderPSMRFQ');
+    
     if (contentEl) {
         const mockRFQs = [
             { id: 'RFQ-2026-008', item: 'Laptop Dell XPS 15', vendors: 3, status: 'Quotes Received', deadline: '2026-08-10' },
@@ -1774,6 +2008,8 @@ function renderPSMSourcingPipeline() {
             <button onclick="renderPSMSpendAnalytics()" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-outline-variant/50 text-on-surface hover:bg-surface-container-low">Spend</button>
         `;
     }
+    
+    syncSidebarWithView('renderPSMSourcingPipeline');
     
     if (contentEl) {
         const mockSuppliers = [
@@ -1848,6 +2084,8 @@ function renderPSMSpendAnalytics() {
             <button onclick="renderPSMSpendAnalytics()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-white">Spend</button>
         `;
     }
+    
+    syncSidebarWithView('renderPSMSpendAnalytics');
     
     if (contentEl) {
         const mockSpend = [

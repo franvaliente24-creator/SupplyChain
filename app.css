@@ -1689,6 +1689,189 @@ button, label[for^="filter-"] {
   color: #2563eb;
 }
 
+/* Sidebar Module Group with Submenu */
+.sidebar-module-group {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-module-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: transparent;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  text-decoration: none;
+}
+
+.sidebar-module-toggle:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: transparent;
+  transform: translateX(2px);
+}
+
+.sidebar-module-toggle.active {
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.sidebar-module-toggle.active .sidebar-subsystem-link-icon {
+  background: rgba(59, 130, 246, 0.16);
+  color: #2563eb;
+}
+
+.sidebar-chevron {
+  transition: transform var(--transition-fast);
+  margin-left: auto;
+}
+
+.sidebar-module-group.open .sidebar-chevron {
+  transform: rotate(180deg);
+}
+
+/* Sidebar Submenu */
+.sidebar-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  padding-left: 2.25rem;
+}
+
+.sidebar-module-group.open .sidebar-submenu {
+  max-height: 500px;
+  transition: max-height 0.3s ease-in;
+}
+
+.sidebar-submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 1.25rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  text-decoration: none;
+  margin-top: 0.15rem;
+}
+
+.sidebar-submenu-link:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sidebar-submenu-link.active {
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.sidebar-submenu-icon {
+  font-size: 1rem;
+  color: #94a3b8;
+  transition: color var(--transition-fast);
+}
+
+.sidebar-submenu-link:hover .sidebar-submenu-icon,
+.sidebar-submenu-link.active .sidebar-submenu-icon {
+  color: #2563eb;
+}
+
+/* Collapsed Sidebar Flyout */
+.sidebar-flyout-menu {
+  position: fixed;
+  left: 5rem;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  padding: 0.75rem;
+  min-width: 200px;
+  max-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
+}
+
+.sidebar-flyout-menu.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.sidebar-flyout-header {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.sidebar-flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  text-decoration: none;
+}
+
+.sidebar-flyout-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sidebar-flyout-item.active {
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+/* Collapsed sidebar state - hide non-icon elements */
+.sidebar.w-20 .sidebar-module-toggle span:not(.material-symbols-outlined),
+.sidebar.w-20 .sidebar-chevron,
+.sidebar.w-20 .sidebar-submenu {
+  display: none;
+}
+
+.sidebar.w-20 .sidebar-module-toggle {
+  justify-content: center;
+  padding: 0.85rem;
+}
+
+.sidebar.w-20 .sidebar-module-group {
+  position: relative;
+}
+
+.sidebar.w-20 .sidebar-module-group:hover .sidebar-flyout-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
 .sidebar-main-link {
   display: flex;
   align-items: center;
