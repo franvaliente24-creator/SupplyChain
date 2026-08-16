@@ -192,16 +192,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Module with submenu
             const isModuleOpen = isActive;
             const defaultViewId = mod.subnav[0]?.id;
+            const defaultRender = mod.subnav[0]?.render;
             
             return `
                 <div class="sidebar-module-group ${isModuleOpen ? 'open' : ''}" data-module-id="${mod.id}">
-                    <button type="button" class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" data-module="${mod.id}">
+                    <a href="${getModuleHref(subsystemId, mod.id)}&view=${defaultViewId}" 
+                       class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" 
+                       data-module="${mod.id}"
+                       data-default-render="${defaultRender}">
                         <span class="sidebar-subsystem-link-icon">
                             <span class="material-symbols-outlined">${getModuleIcon(mod.name)}</span>
                         </span>
                         <span class="truncate flex-1 text-left">${mod.name}</span>
                         <span class="material-symbols-outlined sidebar-chevron text-base">expand_more</span>
-                    </button>
+                    </a>
                     <div class="sidebar-submenu" data-submenu-for="${mod.id}">
                         ${mod.subnav.map(sub => {
                             const isSubActive = sub.id === defaultViewId;

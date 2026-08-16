@@ -250,6 +250,12 @@ const SUBSYSTEMS = [
             {
                 id: 'svm',
                 name: 'Supplier / Vendor Management (SVM)',
+                subnav: [
+                    { id: 'supplier-directory', label: 'Supplier Directory', icon: 'contacts', render: 'renderSVMWorkspace' },
+                    { id: 'scorecards', label: 'Scorecards', icon: 'assessment', render: 'renderSVMScorecards' },
+                    { id: 'compliance', label: 'Compliance', icon: 'verified_user', render: 'renderSVMCompliance' },
+                    { id: 'onboarding', label: 'Onboarding', icon: 'person_add', render: 'renderSVMOnboarding' }
+                ],
                 functions: [
                     { name: 'calculateVendorScorecard', description: 'Calculates KPIs including lead time, defect rate, and overall score.' },
                     { name: 'getVendorContracts', description: 'Returns contract types and expiry status for a vendor.' },
@@ -259,6 +265,12 @@ const SUBSYSTEMS = [
             {
                 id: 'pom',
                 name: 'Purchase Order Management (POM)',
+                subnav: [
+                    { id: 'po-pipeline', label: 'PO Pipeline', icon: 'view_list', render: 'renderPOMWorkspace' },
+                    { id: 'po-creation', label: 'PO Creation', icon: 'add_circle', render: 'renderPOMCreation' },
+                    { id: 'grn', label: 'GRN', icon: 'inventory', render: 'renderPOMGRN' },
+                    { id: 'overdue', label: 'Overdue', icon: 'warning', render: 'renderPOMOverdue' }
+                ],
                 functions: [
                     { name: 'createPurchaseOrder', description: 'Creates a new purchase order with draft status.' },
                     { name: 'getPOStatusPipeline', description: 'Returns POs grouped by status (draft, approved, sent, etc.).' },
@@ -269,6 +281,12 @@ const SUBSYSTEMS = [
             {
                 id: 'dtrs',
                 name: 'Document Tracking & Logistics Records System (DTRS)',
+                subnav: [
+                    { id: 'shipment-tracking', label: 'Shipment Tracking', icon: 'local_shipping', render: 'renderDTRSWorkspace' },
+                    { id: 'documents', label: 'Documents', icon: 'folder', render: 'renderDTRSDocuments' },
+                    { id: 'delivery', label: 'Delivery', icon: 'check_circle', render: 'renderDTRSDelivery' },
+                    { id: 'exceptions', label: 'Exceptions', icon: 'error', render: 'renderDTRSExceptions' }
+                ],
                 functions: [
                     { name: 'generateWaybillQR', description: 'Generates QR-coded waybill for shipment tracking.' },
                     { name: 'logChainOfCustody', description: 'Logs chain of custody events with timestamp and actor.' },

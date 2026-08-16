@@ -21,11 +21,22 @@ function applyUserToProfile(user) {
 
     const roleLabel = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
-    const avatar = document.querySelector('#profile-dropdown-toggle > div');
-    if (avatar) {
-        avatar.textContent = initials;
-        avatar.title = displayName;
+    const avatarDiv = document.querySelector('#profile-dropdown-toggle > div');
+    if (avatarDiv) {
+        // Update the fallback span with initials
+        const fallbackSpan = avatarDiv.querySelector('span');
+        if (fallbackSpan) {
+            fallbackSpan.textContent = initials;
+            fallbackSpan.style.display = 'flex';
+        }
+        // Hide the image and show the fallback
+        const img = avatarDiv.querySelector('img');
+        if (img) {
+            img.style.display = 'none';
+        }
+        avatarDiv.title = displayName;
     }
+
     const nameEls = document.querySelectorAll('#profile-dropdown-toggle span.font-label');
     if (nameEls[0]) nameEls[0].textContent = displayName || 'Admin User';
     const roleEls = document.querySelectorAll('#profile-dropdown-toggle span.text-xs');
