@@ -489,14 +489,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isCollapsed) {
                 sidebar.classList.add('w-20');
                 sidebar.classList.remove('w-72');
-                sidebar.style.width = '5rem';
+                sidebar.style.width = '';
                 sidebarToggleIcon.textContent = 'menu';
                 document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
                 document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.add('hidden'));
             } else {
                 sidebar.classList.remove('w-20');
                 sidebar.classList.add('w-72');
-                sidebar.style.width = '18rem';
+                sidebar.style.width = '';
                 sidebarToggleIcon.textContent = 'menu_open';
                 document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
                 document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.remove('hidden'));
