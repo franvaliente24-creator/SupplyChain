@@ -196,16 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             return `
                 <div class="sidebar-module-group ${isModuleOpen ? 'open' : ''}" data-module-id="${mod.id}">
-                    <a href="${getModuleHref(subsystemId, mod.id)}&view=${defaultViewId}" 
-                       class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" 
-                       data-module="${mod.id}"
-                       data-default-render="${defaultRender}">
+                    <button type="button" class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" data-module="${mod.id}" data-default-render="${defaultRender}">
                         <span class="sidebar-subsystem-link-icon">
                             <span class="material-symbols-outlined">${getModuleIcon(mod.name)}</span>
                         </span>
                         <span class="truncate flex-1 text-left">${mod.name}</span>
                         <span class="material-symbols-outlined sidebar-chevron text-base">expand_more</span>
-                    </a>
+                    </button>
                     <div class="sidebar-submenu" data-submenu-for="${mod.id}">
                         ${mod.subnav.map(sub => {
                             const isSubActive = sub.id === defaultViewId;
@@ -517,22 +514,17 @@ function initSidebarNavigation() {
         const href = link.getAttribute('href');
         if (!href) return;
 
-        // Only handle navigation to module.html or dashboard.html
-        if (!href.includes('module.html') && !href.includes('dashboard.html')) return;
-
-        e.preventDefault();
-
-        // Update URL without full page reload
-        const url = new URL(href, window.location.origin);
-        window.history.pushState({}, '', url.href);
-
-        // Navigate based on new URL
-        if (href.includes('module.html')) {
-            window.location.href = href; // Full navigation to module page
-        } else if (href.includes('dashboard.html')) {
-            // Re-render dashboard with new subsystem
-            location.reload(); // Simple reload for dashboard
+        // Check if this is a submenu link (sub-view navigation within same module)
+        const isSubmenuLink = link.classList.contains('sidebar-submenu-link');
+        
+        // For submenu links, let the submenu click handler in initSidebarSubmenus handle this
+        if (isSubmenuLink) {
+            return;
         }
+
+        // For all other links, let the default anchor behavior handle navigation
+        // This ensures proper module switching and dashboard navigation
+        return;
     };
 
     // Attach to sidebar navigation container
