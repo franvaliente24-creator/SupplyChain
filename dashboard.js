@@ -489,16 +489,63 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isCollapsed) {
                 sidebar.classList.add('w-20');
                 sidebar.classList.remove('w-72');
+                sidebar.style.width = '5rem';
                 sidebarToggleIcon.textContent = 'menu';
                 document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
                 document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.add('hidden'));
             } else {
                 sidebar.classList.remove('w-20');
                 sidebar.classList.add('w-72');
+                sidebar.style.width = '18rem';
                 sidebarToggleIcon.textContent = 'menu_open';
                 document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
                 document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.remove('hidden'));
             }
+        });
+    }
+
+    // Sidebar resize functionality
+    const resizeHandle = document.getElementById('sidebar-resize-handle');
+    if (resizeHandle && sidebar) {
+        let isResizing = false;
+        let startX, startWidth;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = sidebar.offsetWidth;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(200, Math.min(500, startWidth + diff));
+            sidebar.style.width = newWidth + 'px';
+            
+            // Update collapsed state
+            if (newWidth <= 100) {
+                isCollapsed = true;
+                sidebar.classList.add('w-20');
+                sidebar.classList.remove('w-72');
+                sidebarToggleIcon.textContent = 'menu';
+                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.add('hidden'));
+            } else {
+                isCollapsed = false;
+                sidebar.classList.remove('w-20');
+                sidebar.classList.remove('w-72');
+                sidebarToggleIcon.textContent = 'menu_open';
+                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.remove('hidden'));
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
         });
     }
 });
@@ -508,6 +555,7 @@ function initSidebarSubmenus() {
     document.querySelectorAll('.sidebar-module-toggle').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const group = toggle.closest('.sidebar-module-group');
             const moduleId = toggle.dataset.module;
             
@@ -532,6 +580,9 @@ function initSidebarSubmenus() {
     // Handle submenu link clicks
     document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             // Update active state for all submenu items in the same group
             const submenu = link.closest('.sidebar-submenu');
             if (submenu) {
@@ -542,7 +593,6 @@ function initSidebarSubmenus() {
             // Get render function from data attribute and call it
             const renderFunc = link.dataset.render;
             if (renderFunc && window[renderFunc]) {
-                e.preventDefault();
                 // Update URL without full page reload
                 const url = new URL(window.location);
                 url.searchParams.set('view', link.dataset.view);

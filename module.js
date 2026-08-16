@@ -189,7 +189,39 @@ document.addEventListener('DOMContentLoaded', () => {
     renderModulePage();
     initSidebarSubmenus();
     initSidebarNavigation();
+    initSidebarResize();
 });
+
+function initSidebarResize() {
+    const resizeHandle = document.getElementById('sidebar-resize-handle');
+    const sidebar = document.getElementById('app-sidebar');
+    
+    if (resizeHandle && sidebar) {
+        let isResizing = false;
+        let startX, startWidth;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = sidebar.offsetWidth;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(200, Math.min(500, startWidth + diff));
+            sidebar.style.width = newWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+    }
+}
 
 function initSidebarNavigation() {
     // Handle sidebar link clicks for in-page navigation
@@ -337,36 +369,46 @@ function initSidebarSubmenus() {
     document.querySelectorAll('.sidebar-module-toggle').forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const group = toggle.closest('.sidebar-module-group');
             const moduleId = toggle.dataset.module;
             
-            // Toggle accordion
-            if (group) {
-                group.classList.toggle('open');
-            }
-            
-            // Navigate to the module with its default view
-            const subsystemId = getSubsystemFromUrl() || 'supply-chain';
-            const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
-            const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
-            const defaultRender = firstSubmenuLink ? firstSubmenuLink.dataset.render : null;
-            
-            // Check if we're already on module.html
+            // Check if we're already on module.html and this module
             const isOnModulePage = window.location.pathname.includes('module.html');
             const currentModuleId = getModuleFromUrl();
+            const isSameModule = isOnModulePage && currentModuleId === moduleId;
             
-            if (isOnModulePage && currentModuleId === moduleId) {
-                // Already on this module, just update the view in-page
-                if (defaultRender && window[defaultRender]) {
-                    const url = new URL(window.location);
-                    url.searchParams.set('view', defaultViewId);
-                    window.history.pushState({}, '', url);
-                    window[defaultRender]();
+            // Toggle accordion
+            if (group) {
+                const wasOpen = group.classList.contains('open');
+                group.classList.toggle('open');
+                
+                // If we just opened it and it's the same module, don't navigate
+                if (!wasOpen && isSameModule) {
+                    return;
                 }
-            } else {
-                // Navigate to the module page
-                const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
-                window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
+            }
+            
+            // Navigate to the module with its default view (only if different module)
+            if (!isSameModule) {
+                const subsystemId = getSubsystemFromUrl() || 'supply-chain';
+                const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
+                const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
+                const defaultRender = firstSubmenuLink ? firstSubmenuLink.dataset.render : null;
+                
+                if (isOnModulePage && currentModuleId === moduleId) {
+                    // Already on this module, just update the view in-page
+                    if (defaultRender && window[defaultRender]) {
+                        const url = new URL(window.location);
+                        url.searchParams.set('view', defaultViewId);
+                        window.history.pushState({}, '', url);
+                        window[defaultRender]();
+                    }
+                } else {
+                    // Navigate to the module page
+                    const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+                    window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
+                }
             }
         });
     });
@@ -374,6 +416,9 @@ function initSidebarSubmenus() {
     // Handle submenu link clicks
     document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             // Update active state for all submenu items in the same group
             const submenu = link.closest('.sidebar-submenu');
             if (submenu) {
@@ -384,7 +429,6 @@ function initSidebarSubmenus() {
             // Get render function from data attribute and call it
             const renderFunc = link.dataset.render;
             if (renderFunc && window[renderFunc]) {
-                e.preventDefault();
                 // Update URL without full page reload
                 const url = new URL(window.location);
                 url.searchParams.set('view', link.dataset.view);

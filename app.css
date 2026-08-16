@@ -1641,7 +1641,7 @@ button, label[for^="filter-"] {
   border: 1px solid transparent;
   border-radius: 1.25rem;
   color: #334155;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.3;
   text-decoration: none;
@@ -1859,28 +1859,58 @@ button, label[for^="filter-"] {
 /* Collapsed sidebar state - hide non-icon elements but keep icons visible */
 .sidebar.w-20 .sidebar-module-toggle span:not(.material-symbols-outlined),
 .sidebar.w-20 .sidebar-chevron,
-.sidebar.w-20 .sidebar-submenu {
+.sidebar.w-20 .sidebar-submenu,
+.dashboard-sidebar.w-20 .sidebar-module-toggle span:not(.material-symbols-outlined),
+.dashboard-sidebar.w-20 .sidebar-chevron,
+.dashboard-sidebar.w-20 .sidebar-submenu {
   display: none;
 }
 
-.sidebar.w-20 .sidebar-module-toggle {
+.sidebar.w-20 .sidebar-module-toggle,
+.dashboard-sidebar.w-20 .sidebar-module-toggle {
   justify-content: center;
   padding: 0.85rem;
 }
 
-.sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined {
+.sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
+.dashboard-sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
+.sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined,
+.dashboard-sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined {
   display: inline-flex !important;
   font-size: 1.25rem;
 }
 
-.sidebar.w-20 .sidebar-module-group {
+.sidebar.w-20 .sidebar-module-group,
+.dashboard-sidebar.w-20 .sidebar-module-group {
   position: relative;
 }
 
-.sidebar.w-20 .sidebar-module-group:hover .sidebar-flyout-menu {
+.sidebar.w-20 .sidebar-module-group:hover .sidebar-flyout-menu,
+.dashboard-sidebar.w-20 .sidebar-module-group:hover .sidebar-flyout-menu {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
+}
+
+/* Sidebar resize handle */
+#sidebar-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+  z-index: 50;
+}
+
+#sidebar-resize-handle:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+#sidebar-resize-handle:active {
+  background: rgba(59, 130, 246, 0.5);
 }
 
 .sidebar-main-link {
