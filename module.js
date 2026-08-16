@@ -347,9 +347,11 @@ function initSidebarSubmenus() {
             
             // Navigate to the module with its default view
             const subsystemId = getSubsystemFromUrl() || 'supply-chain';
-            const moduleHref = getModuleHref(subsystemId, moduleId);
             const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
             const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
+            
+            // Construct URL directly
+            const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
             
             // Full page navigation to the module
             window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');

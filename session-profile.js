@@ -23,18 +23,20 @@ function applyUserToProfile(user) {
 
     const avatarDiv = document.querySelector('#profile-dropdown-toggle > div');
     if (avatarDiv) {
-        // Update the fallback span with initials
+        avatarDiv.title = displayName;
+        
+        // Always show the initials as the primary display
         const fallbackSpan = avatarDiv.querySelector('span');
         if (fallbackSpan) {
             fallbackSpan.textContent = initials;
             fallbackSpan.style.display = 'flex';
         }
-        // Hide the image and show the fallback
+        
+        // Hide the image since it's not working
         const img = avatarDiv.querySelector('img');
         if (img) {
             img.style.display = 'none';
         }
-        avatarDiv.title = displayName;
     }
 
     const nameEls = document.querySelectorAll('#profile-dropdown-toggle span.font-label');

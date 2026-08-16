@@ -475,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sidebar navigation handling
     initSidebarNavigation();
+    initSidebarSubmenus();
 
     // Sidebar collapse functionality
     const sidebarToggle = document.getElementById('desktop-sidebar-toggle');
@@ -501,6 +502,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function initSidebarSubmenus() {
+    // Handle module toggle clicks (accordion behavior + navigate to module)
+    document.querySelectorAll('.sidebar-module-toggle').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const group = toggle.closest('.sidebar-module-group');
+            const moduleId = toggle.dataset.module;
+            
+            // Toggle accordion
+            if (group) {
+                group.classList.toggle('open');
+            }
+            
+            // Navigate to the module with its default view
+            const subsystemId = getSubsystemFromUrl() || 'supply-chain';
+            const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
+            const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
+            
+            // Construct URL directly
+            const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+            
+            // Full page navigation to the module
+            window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
+        });
+    });
+
+    // Handle submenu link clicks
+    document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // Update active state for all submenu items in the same group
+            const submenu = link.closest('.sidebar-submenu');
+            if (submenu) {
+                submenu.querySelectorAll('.sidebar-submenu-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+
+            // Get render function from data attribute and call it
+            const renderFunc = link.dataset.render;
+            if (renderFunc && window[renderFunc]) {
+                e.preventDefault();
+                // Update URL without full page reload
+                const url = new URL(window.location);
+                url.searchParams.set('view', link.dataset.view);
+                window.history.pushState({}, '', url);
+                
+                // Call the render function
+                window[renderFunc]();
+            }
+        });
+    });
+}
 
 function initSidebarNavigation() {
     // Handle sidebar link clicks for in-page navigation
