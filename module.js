@@ -349,12 +349,25 @@ function initSidebarSubmenus() {
             const subsystemId = getSubsystemFromUrl() || 'supply-chain';
             const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
             const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
+            const defaultRender = firstSubmenuLink ? firstSubmenuLink.dataset.render : null;
             
-            // Construct URL directly
-            const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+            // Check if we're already on module.html
+            const isOnModulePage = window.location.pathname.includes('module.html');
+            const currentModuleId = getModuleFromUrl();
             
-            // Full page navigation to the module
-            window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
+            if (isOnModulePage && currentModuleId === moduleId) {
+                // Already on this module, just update the view in-page
+                if (defaultRender && window[defaultRender]) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('view', defaultViewId);
+                    window.history.pushState({}, '', url);
+                    window[defaultRender]();
+                }
+            } else {
+                // Navigate to the module page
+                const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+                window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
+            }
         });
     });
 

@@ -25,17 +25,19 @@ function applyUserToProfile(user) {
     if (avatarDiv) {
         avatarDiv.title = displayName;
         
-        // Always show the initials as the primary display
+        // Update the fallback span with initials
         const fallbackSpan = avatarDiv.querySelector('span');
         if (fallbackSpan) {
             fallbackSpan.textContent = initials;
-            fallbackSpan.style.display = 'flex';
+            // Reset to hidden, let image's onerror handle showing it
+            fallbackSpan.style.display = 'none';
         }
         
-        // Hide the image since it's not working
+        // Update image source and try to show it
         const img = avatarDiv.querySelector('img');
         if (img) {
-            img.style.display = 'none';
+            img.src = '/SupplyChain/img/profile.jpg';
+            img.style.display = 'block';
         }
     }
 

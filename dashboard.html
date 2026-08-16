@@ -11,22 +11,22 @@
 <title>Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 </head>
 <body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 <div id="sidebar-backdrop" class="fixed top-16 bottom-0 left-0 right-0 md:inset-0 bg-gray-900/50 backdrop-blur-md z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
 <!-- Left Sidebar (Collapsible on Desktop, Slide-over on Mobile) -->
-<aside id="app-sidebar" class="dashboard-sidebar fixed md:static top-16 bottom-0 md:inset-y-0 left-0 z-50 bg-white flex flex-col h-[calc(100vh-4rem)] md:h-full shrink-0 shadow-xl md:shadow-none transition-all duration-300 ease-in-out overflow-hidden w-72 border-r border-slate-200 -translate-x-full md:translate-x-0 opacity-100">
-    <div class="px-5 pt-6 pb-5 border-b border-slate-200">
-        <div class="sidebar-brand-card rounded-[2rem] p-6 flex flex-col items-center text-center gap-3">
-            <span class="sidebar-brand-icon inline-flex items-center justify-center w-14 h-14 rounded-[1.75rem] bg-slate-100 text-primary text-2xl shadow-sm">
-                <span class="material-symbols-outlined">account_balance</span>
-            </span>
-            <p id="sidebar-brand-title" class="text-sm font-semibold text-slate-950 truncate">Subsystem</p>
-            <p id="sidebar-brand-category" class="text-xs text-slate-500 mt-1 truncate">Select a subsystem</p>
+<aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-outline-variant/30 flex flex-col shrink-0 transition-all duration-300 relative">
+    <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-40"></div>
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
+        <div class="sidebar-brand-section">
+            <div class="sidebar-brand-card">
+                <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary text-xl">inventory_2</span>
+                </div>
+                <div class="sidebar-brand-title" id="sidebar-brand-title">Supply Chain</div>
+                <div class="sidebar-brand-subtitle" id="sidebar-brand-category">Management System</div>
+            </div>
         </div>
-    </div>
-    <nav class="flex-1 overflow-y-auto px-5 py-6 space-y-3">
         <a id="sidebar-dashboard-link" class="sidebar-main-link active" href="dashboard.html?subsystem=supply-chain">
             <span class="sidebar-main-link-icon material-symbols-outlined">dashboard</span>
             <span class="font-label font-medium text-sm">Dashboard</span>
@@ -51,7 +51,10 @@
 </div>
 
 <!-- Right Side: Profile Dropdown -->
-<div class="relative flex items-center">
+<div class="relative flex items-center gap-2">
+  <button type="button" class="p-2 rounded-full hover:bg-surface-container-low transition-colors focus:outline-none border border-transparent hover:border-outline-variant/30 cursor-pointer" title="Notifications">
+    <span class="material-symbols-outlined text-on-surface-variant text-xl">notifications</span>
+  </button>
   <button id="profile-dropdown-toggle" type="button" class="flex items-center gap-3 p-1.5 rounded-full hover:bg-surface-container-low transition-colors focus:outline-none border border-transparent hover:border-outline-variant/30 cursor-pointer" aria-expanded="false" title="Account Menu">
     <div class="w-9 h-9 rounded-full bg-primary-container/30 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shadow-2xs shrink-0 overflow-hidden">
       <img src="/SupplyChain/Image/profile.jpg" alt="User profile" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
