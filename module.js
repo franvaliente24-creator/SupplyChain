@@ -11,9 +11,25 @@ function renderModulePage() {
     const sidebarDashboardLink = document.getElementById('sidebar-dashboard-link');
     const moduleContent = document.getElementById('module-content');
 
-    if (!subsystem || !module || !moduleContent) {
-        window.location.replace(getDashboardHref(subsystemId));
-        return;
+    // Guard against false redirects - only redirect if subsystems.js has loaded and module genuinely doesn't exist
+    if (typeof SUBSYSTEMS === 'undefined' || !subsystem || (moduleId && !module) || !moduleContent) {
+        // If we're on a module page but the module lookup failed, only redirect if we're confident
+        // This prevents race conditions from causing false redirects
+        if (typeof SUBSYSTEMS !== 'undefined' && subsystem && moduleId && !module) {
+            // Module genuinely doesn't exist
+            window.location.replace(getDashboardHref(subsystemId));
+            return;
+        }
+        // If subsystems.js hasn't loaded yet, wait and try again
+        if (typeof SUBSYSTEMS === 'undefined') {
+            setTimeout(renderModulePage, 100);
+            return;
+        }
+        // If we don't have a module ID (shouldn't happen on module.html), redirect
+        if (!moduleId) {
+            window.location.replace(getDashboardHref(subsystemId));
+            return;
+        }
     }
 
     document.title = `${module.name} — ${subsystem.title}`;
@@ -171,7 +187,62 @@ function renderModulePage() {
 document.addEventListener('DOMContentLoaded', () => {
     renderModulePage();
     initSidebarSubmenus();
+    initSidebarNavigation();
 });
+
+function initSidebarNavigation() {
+    // Handle sidebar link clicks for in-page navigation
+    const handleSidebarClick = (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        // Allow ctrl/cmd/middle-click for opening in new tab
+        if (e.ctrlKey || e.metaKey || e.button === 1) return;
+
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        // Only handle navigation to module.html or dashboard.html
+        if (!href.includes('module.html') && !href.includes('dashboard.html')) return;
+
+        e.preventDefault();
+
+        // Update URL without full page reload
+        const url = new URL(href, window.location.origin);
+        window.history.pushState({}, '', url.href);
+
+        // Re-render based on new URL
+        if (href.includes('module.html')) {
+            renderModulePage();
+            initSidebarSubmenus();
+        } else if (href.includes('dashboard.html')) {
+            window.location.href = href; // Full navigation to dashboard
+        }
+    };
+
+    // Attach to sidebar navigation container
+    const sidebarNav = document.querySelector('.sidebar-subsystem-modules');
+    if (sidebarNav) {
+        sidebarNav.addEventListener('click', handleSidebarClick);
+    }
+
+    // Attach to dashboard link
+    const dashboardLink = document.getElementById('sidebar-dashboard-link');
+    if (dashboardLink) {
+        dashboardLink.addEventListener('click', handleSidebarClick);
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('module.html')) {
+            renderModulePage();
+            initSidebarSubmenus();
+        } else {
+            window.location.reload();
+        }
+    });
+}
 
 function wireQuickActionButtons(moduleId) {
     const workspaceBtn = document.getElementById('quick-action-workspace');

@@ -3,6 +3,7 @@
 <html lang="en"><head>
 <link href="app.css" rel="stylesheet"/>
 <script src="subsystems.js" defer></script>
+<script src="session-profile.js" defer></script>
 <script src="app.js" defer></script>
 <script src="dashboard.js" defer></script>
 <meta charset="utf-8"/>
@@ -33,6 +34,7 @@
         <div id="sidebar-subsystem-nav-panel" class="sidebar-subsystem-nav-panel">
             <nav id="sidebar-subsystem-modules-nav" class="sidebar-subsystem-modules"></nav>
         </div>
+    </nav>
 </aside>
 <!-- Main Content Wrapper -->
 <div class="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -458,49 +460,6 @@ Cancel
     function submitQuickAction() {
         closeDashboardModal('dash-quick-action-modal');
         confirmDashboardAction(null, 'Action submitted successfully!');
-    }
-
-    function applyUserToProfile(user) {
-        const email = user.email || 'admin@example.com';
-        const role = user.role || 'Administrator';
-        const rawUsername = user.username || '';
-        const atIdx = email.indexOf('@');
-        const namePart = rawUsername
-            ? rawUsername
-            : (atIdx > 0 ? email.slice(0, atIdx) : email);
-
-        const initials = namePart
-            .split(/[._-\s]+/)
-            .filter(Boolean)
-            .map(p => p.charAt(0).toUpperCase())
-            .slice(0, 2)
-            .join('') || 'AU';
-
-        const displayName = rawUsername
-            ? rawUsername.replace(/[._-\s]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim()
-            : namePart.replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim();
-
-        const roleLabel = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-
-        const avatar = document.querySelector('#profile-dropdown-toggle > div');
-        if (avatar) {
-            avatar.textContent = initials;
-            avatar.title = displayName;
-        }
-        const nameEls = document.querySelectorAll('#profile-dropdown-toggle span.font-label');
-        if (nameEls[0]) nameEls[0].textContent = displayName || 'Admin User';
-        const roleEls = document.querySelectorAll('#profile-dropdown-toggle span.text-xs');
-        if (roleEls[0]) roleEls[0].textContent = roleLabel;
-
-        const mobileName = document.querySelector('#profile-dropdown-menu p.text-sm.font-semibold');
-        if (mobileName) mobileName.textContent = displayName || 'Admin User';
-        const mobileEmail = document.querySelector('#profile-dropdown-menu p.text-xs.text-on-surface-variant.truncate');
-        if (mobileEmail) mobileEmail.textContent = email;
-
-        const heading = document.getElementById('dashboard-heading');
-        if (heading) {
-            heading.textContent = `Welcome back, ${displayName || 'Admin'}`;
-        }
     }
 
     (async function ensureAuthenticated() {

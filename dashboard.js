@@ -472,6 +472,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Sidebar navigation handling
+    initSidebarNavigation();
+
     // Sidebar collapse functionality
     const sidebarToggle = document.getElementById('desktop-sidebar-toggle');
     const sidebar = document.getElementById('app-sidebar');
@@ -497,3 +500,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function initSidebarNavigation() {
+    // Handle sidebar link clicks for in-page navigation
+    const handleSidebarClick = (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        // Allow ctrl/cmd/middle-click for opening in new tab
+        if (e.ctrlKey || e.metaKey || e.button === 1) return;
+
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        // Only handle navigation to module.html or dashboard.html
+        if (!href.includes('module.html') && !href.includes('dashboard.html')) return;
+
+        e.preventDefault();
+
+        // Update URL without full page reload
+        const url = new URL(href, window.location.origin);
+        window.history.pushState({}, '', url.href);
+
+        // Navigate based on new URL
+        if (href.includes('module.html')) {
+            window.location.href = href; // Full navigation to module page
+        } else if (href.includes('dashboard.html')) {
+            // Re-render dashboard with new subsystem
+            location.reload(); // Simple reload for dashboard
+        }
+    };
+
+    // Attach to sidebar navigation container
+    const sidebarNav = document.querySelector('.sidebar-subsystem-modules');
+    if (sidebarNav) {
+        sidebarNav.addEventListener('click', handleSidebarClick);
+    }
+
+    // Attach to dashboard link
+    const dashboardLink = document.getElementById('sidebar-dashboard-link');
+    if (dashboardLink) {
+        dashboardLink.addEventListener('click', handleSidebarClick);
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+        location.reload();
+    });
+}

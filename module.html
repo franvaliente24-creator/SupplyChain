@@ -3,6 +3,7 @@
 <head>
 <link href="app.css" rel="stylesheet"/>
 <script src="subsystems.js" defer></script>
+<script src="session-profile.js" defer></script>
 <script src="app.js" defer></script>
 <script src="module.js" defer></script>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -189,7 +190,10 @@ document.addEventListener('keydown', (e) => {
         const data = await resp.json();
         if (!data || !data.logged_in) {
             window.location.replace('index.html');
+            return;
         }
+        // Apply user data to profile UI
+        applyUserToProfile(data);
     } catch (e) {
         console.warn('Auth check error:', e);
     }
