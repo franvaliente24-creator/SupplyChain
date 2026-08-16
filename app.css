@@ -1857,13 +1857,19 @@ button, label[for^="filter-"] {
 }
 
 /* Collapsed sidebar state - hide non-icon elements but keep icons visible */
-.sidebar.w-20 .sidebar-module-toggle span:not(.material-symbols-outlined),
+.sidebar.w-20 .sidebar-module-toggle > span:not(.material-symbols-outlined),
 .sidebar.w-20 .sidebar-chevron,
 .sidebar.w-20 .sidebar-submenu,
-.dashboard-sidebar.w-20 .sidebar-module-toggle span:not(.material-symbols-outlined),
+.sidebar.w-20 .sidebar-brand-title,
+.sidebar.w-20 .sidebar-brand-subtitle,
+.sidebar.w-20 .sidebar-main-link span:not(.material-symbols-outlined),
+.dashboard-sidebar.w-20 .sidebar-module-toggle > span:not(.material-symbols-outlined),
 .dashboard-sidebar.w-20 .sidebar-chevron,
-.dashboard-sidebar.w-20 .sidebar-submenu {
-  display: none;
+.dashboard-sidebar.w-20 .sidebar-submenu,
+.dashboard-sidebar.w-20 .sidebar-brand-title,
+.dashboard-sidebar.w-20 .sidebar-brand-subtitle,
+.dashboard-sidebar.w-20 .sidebar-main-link span:not(.material-symbols-outlined) {
+  display: none !important;
 }
 
 .sidebar.w-20 .sidebar-module-toggle,
@@ -1873,9 +1879,11 @@ button, label[for^="filter-"] {
 }
 
 .sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
-.dashboard-sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
 .sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined,
-.dashboard-sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined {
+.sidebar.w-20 .sidebar-main-link .material-symbols-outlined,
+.dashboard-sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
+.dashboard-sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined,
+.dashboard-sidebar.w-20 .sidebar-main-link .material-symbols-outlined {
   display: inline-flex !important;
   font-size: 1.25rem;
 }

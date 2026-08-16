@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${mod.subnav.map(sub => {
                             const isSubActive = sub.id === defaultViewId;
                             return `
-                                <a href="${getModuleHref(subsystemId, mod.id)}&view=${sub.id}" 
+                                <a href="#"
                                    class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
                                    data-view="${sub.id}"
                                    data-render="${sub.render}">
