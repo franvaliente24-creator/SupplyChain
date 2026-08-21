@@ -57,13 +57,23 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $req_id = (int)$_POST['requisition_id'];
         $current_stage = $_POST['current_stage'];
         
+        // Get requisition details for budget check
+        $req_details = $conn->query("SELECT * FROM purchase_requisitions WHERE requisition_id = $req_id")->fetch_assoc();
+        $estimated_cost = (float)($req_details['estimated_cost'] ?? 0);
+        
         $next_stage = 'Recruiter Lead';
         $new_status = 'Pending Approval';
 
         if ($current_stage === 'Recruiter Lead') {
             $next_stage = 'IT Director';
         } elseif ($current_stage === 'IT Director') {
-            $next_stage = 'Finance';
+            // Check if budget exceeds ₱50,000 for multi-level approval
+            if ($estimated_cost > 50000) {
+                $next_stage = 'Finance'; // Requires finance approval for amounts > ₱50,000
+            } else {
+                $next_stage = 'Fully Approved';
+                $new_status = 'Sourced';
+            }
         } elseif ($current_stage === 'Finance') {
             $next_stage = 'Fully Approved';
             $new_status = 'Sourced';
@@ -75,7 +85,7 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute()) {
             $flash = "Requisition advanced to stage: $next_stage.";
             $log_msg = "Requisition #" . $req_id . " advanced to " . $next_stage;
-            $conn->query("INSERT INTO activity_log (label, status, status_class) VALUES ('$log_msg', 'Approved', 'status-pill-success')");
+            $conn->query("INSERT INTO activity_log (user_id, username, action, details) VALUES (" . $_SESSION['user_id'] . ", '" . $_SESSION['username'] . "', 'Requisition Approval', '$log_msg')");
         } else {
             $db_error = "Failed to update approval stage: " . $stmt->error;
         }

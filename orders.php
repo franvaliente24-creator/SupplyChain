@@ -328,13 +328,14 @@ $editable_statuses_json = json_encode($editable_statuses);
                                     <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Order Date</th>
                                     <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total</th>
                                     <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
+                                    <th class="py-3 pl-3 pr-6 text-xs font-bold text-on-surface-variant uppercase tracking-wider">QR</th>
                                     <th class="py-3 pl-3 pr-6 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-outline-variant/40">
                                 <?php if (empty($orders)): ?>
                                     <tr>
-                                        <td colspan="7" class="px-6 py-10 text-center text-on-surface-variant text-sm">
+                                        <td colspan="8" class="px-6 py-10 text-center text-on-surface-variant text-sm">
                                             <?php echo $search !== '' ? 'No orders match your search.' : 'No purchase orders found yet.'; ?>
                                         </td>
                                     </tr>
@@ -351,6 +352,9 @@ $editable_statuses_json = json_encode($editable_statuses);
                                             <td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant"><?php echo date('M j, Y', strtotime($order['order_date'])); ?></td>
                                             <td class="py-3.5 px-4 whitespace-nowrap font-medium text-on-surface">₱<?php echo number_format((float)$order['total_amount'], 2); ?></td>
                                             <td class="py-3.5 px-4 whitespace-nowrap">
+                                                <a href="qr_generator.php?order_id=<?php echo (int)$order['order_id']; ?>" target="_blank" class="text-blue-600 hover:underline text-xs">View QR</a>
+                                            </td>
+                                            <td class="py-3.5 pl-3 pr-6 whitespace-nowrap">
                                                 <span class="status-badge <?php echo $meta['class']; ?>"><?php echo htmlspecialchars($meta['label']); ?></span>
                                             </td>
                                             <td class="py-3.5 pl-3 pr-6 whitespace-nowrap text-right">
@@ -393,6 +397,9 @@ $editable_statuses_json = json_encode($editable_statuses);
                                 <div class="text-sm font-medium text-on-surface"><?php echo htmlspecialchars($order['supplier_name'] ?: 'Unassigned'); ?></div>
                                 <div class="text-xs text-on-surface-variant">
                                     <?php echo count($order['items']); ?> items · <?php echo date('M j, Y', strtotime($order['order_date'])); ?> · ₱<?php echo number_format((float)$order['total_amount'], 2); ?>
+                                </div>
+                                <div class="text-xs text-blue-600 hover:underline">
+                                    <a href="qr_generator.php?order_id=<?php echo (int)$order['order_id']; ?>" target="_blank">View QR</a>
                                 </div>
                                 <?php if ($isEditable): ?>
                                     <button type="button" onclick='openEditModal(<?php echo json_encode($order); ?>)' class="text-xs font-medium text-primary">Edit</button>
