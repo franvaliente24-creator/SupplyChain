@@ -1,0 +1,271 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header("Location: index.html");
+    exit();
+}
+
+require_once 'db_connection.php';
+
+$section_title = "PO QR Scanner & Verification";
+$admin_user = $_SESSION['username'] ?? 'Admin User';
+$user_role = $_SESSION['role'] ?? 'Supply Chain Manager';
+
+$db_error = null;
+$flash = null;
+$verified_po = null;
+
+// Handle QR code scanning for PO verification
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['qr_data'])) {
+    $qr_data = trim($_POST['qr_data']);
+    
+    // Try to find PO by QR code (format: PO-PO_NUMBER)
+    if (preg_match('/^PO-(.+)$/', $qr_data, $matches)) {
+        $po_number = $matches[1];
+        
+        // Check if po_qr_codes table exists
+        $qr_table_exists = false;
+        $check_table = $conn->query("SHOW TABLES LIKE 'po_qr_codes'");
+        if ($check_table && $check_table->num_rows > 0) {
+            $qr_table_exists = true;
+        }
+        $check_table->free();
+        
+        if ($qr_table_exists) {
+            // Look up in po_qr_codes table
+            $stmt = $conn->prepare("SELECT pqc.*, o.order_number, o.supplier_id, o.status, o.total_amount 
+                                         FROM po_qr_codes pqc 
+                                         JOIN orders o ON pqc.order_id = o.order_id 
+                                         WHERE pqc.qr_code = ? LIMIT 1");
+            $stmt->bind_param("s", $qr_data);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $verified_po = $result->fetch_assoc();
+                
+                // Mark as scanned
+                $update_stmt = $conn->prepare("UPDATE po_qr_codes SET scanned = 1, scanned_date = NOW(), scanned_by = ? WHERE qr_id = ?");
+                $update_stmt->bind_param("ii", (int)$_SESSION['user_id'], (int)$verified_po['qr_id']);
+                $update_stmt->execute();
+                $update_stmt->close();
+                
+                $flash = "PO verified successfully: " . $verified_po['order_number'];
+                
+                $log_msg = "Scanned and verified PO: " . $verified_po['order_number'];
+                $conn->query("INSERT INTO activity_log (user_id, username, action, details) VALUES (" . $_SESSION['user_id'] . ", '" . $_SESSION['username'] . "', 'PO QR Scan', '$log_msg')");
+            } else {
+                // Fallback to direct PO number lookup
+                $stmt = $conn->prepare("SELECT * FROM orders WHERE order_number = ? LIMIT 1");
+                $stmt->bind_param("s", $po_number);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $verified_po = $result->fetch_assoc();
+                    $flash = "PO found: " . $verified_po['order_number'] . " (QR not in tracking system)";
+                } else {
+                    $db_error = "No PO found with number: $po_number";
+                }
+                $stmt->close();
+            }
+            $stmt->close();
+        } else {
+            // Direct PO number lookup
+            $stmt = $conn->prepare("SELECT * FROM orders WHERE order_number = ? LIMIT 1");
+            $stmt->bind_param("s", $po_number);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $verified_po = $result->fetch_assoc();
+                $flash = "PO found: " . $verified_po['order_number'];
+            } else {
+                $db_error = "No PO found with number: $po_number";
+            }
+            $stmt->close();
+        }
+    } else {
+        $db_error = "Invalid QR code format. Expected PO-XXXX format.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title><?php echo $section_title; ?> — Console</title>
+    <link href="app.css" rel="stylesheet"/>
+    <script src="app.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        .scanner-container {
+            background: #000;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+        #reader {
+            width: 100%;
+            height: 300px;
+        }
+        .result-card {
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
+
+    <?php include 'sidebar.php'; ?>
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
+            <div class="flex items-center gap-3">
+                <span class="font-bold text-slate-800 text-sm">Purchase Order Management</span>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">PO QR Scanner & Verification</h1>
+                        <p class="text-slate-500 text-sm mt-1">Scan PO QR codes to verify shipments and process goods receipt.</p>
+                    </div>
+                </div>
+
+                <?php if ($flash): ?>
+                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-lg">✅ <?php echo htmlspecialchars($flash); ?></div>
+                <?php endif; ?>
+                <?php if ($db_error): ?>
+                    <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">⚠️ <?php echo htmlspecialchars($db_error); ?></div>
+                <?php endif; ?>
+
+                <!-- Scanner Section -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-200">
+                        <h2 class="text-sm font-bold text-slate-900">Scan PO QR Code</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="scanner-container mb-4">
+                            <div id="reader"></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="startScanner()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold">Start Camera</button>
+                            <button type="button" onclick="stopScanner()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600">Stop Camera</button>
+                        </div>
+                        
+                        <!-- Manual Entry Fallback -->
+                        <div class="mt-6 pt-6 border-t border-slate-200">
+                            <form method="post" class="flex gap-3">
+                                <input type="text" name="qr_data" placeholder="Or enter PO QR code manually..." class="flex-1 px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"/>
+                                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold">Verify PO</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verified PO Result -->
+                <?php if ($verified_po): ?>
+                    <div class="result-card p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">PO Verified: <?php echo htmlspecialchars($verified_po['order_number']); ?></h3>
+                                <p class="text-sm text-slate-500">Status: <?php echo htmlspecialchars($verified_po['status']); ?></p>
+                            </div>
+                            <a href="orders.php" class="text-sm text-blue-600 hover:underline">View in Orders</a>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-slate-50 p-3 rounded-lg">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider">Total Amount</p>
+                                <p class="font-semibold text-slate-900">₱<?php echo number_format((float)$verified_po['total_amount'], 2); ?></p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-lg">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider">Order Date</p>
+                                <p class="font-semibold text-slate-900"><?php echo date('M j, Y', strtotime($verified_po['order_date'])); ?></p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-lg">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider">Expected Date</p>
+                                <p class="font-semibold text-slate-900"><?php echo $verified_po['expected_date'] ? date('M j, Y', strtotime($verified_po['expected_date'])) : '—'; ?></p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-lg">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider">QR Status</p>
+                                <p class="font-semibold <?php echo $verified_po['scanned'] ? 'text-emerald-600' : 'text-slate-500'; ?>">
+                                    <?php echo $verified_po['scanned'] ? 'Scanned ' . date('M j, Y g:i A', strtotime($verified_po['scanned_date'])) : 'Not Scanned'; ?>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-2">
+                            <a href="orders.php" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold">View Full PO Details</a>
+                            <a href="qr_generator.php?order_id=<?php echo (int)$verified_po['order_id']; ?>" target="_blank" class="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600">Print QR Code</a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let html5QrcodeScanner = null;
+
+        function startScanner() {
+            if (html5QrcodeScanner) {
+                return; // Already running
+            }
+
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrcodeScanner.start({ facingMode: "environment" }, config, 
+                function(decodedText, decodedResult) {
+                    // Scan successful
+                    stopScanner();
+                    
+                    // Submit the scanned data
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'qr_data';
+                    input.value = decodedText;
+                    
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+                function(errorMessage) {
+                    // Scan error - ignore, it's normal during scanning
+                }
+            ).catch(function(err) {
+                console.error("Error starting scanner", err);
+                alert("Unable to access camera. Please ensure camera permissions are granted.");
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(function() {
+                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner = null;
+                }).catch(function(err) {
+                    console.error("Error stopping scanner", err);
+                });
+            }
+        }
+
+        // Clean up scanner when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            stopScanner();
+        });
+    </script>
+</body>
+</html>

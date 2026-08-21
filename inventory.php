@@ -222,13 +222,14 @@ function getStatusClass($status) {
                                     <th class="px-6 py-3 font-bold text-slate-500 uppercase tracking-wider">Quantity</th>
                                     <th class="px-6 py-3 font-bold text-slate-500 uppercase tracking-wider">Location</th>
                                     <th class="px-6 py-3 font-bold text-slate-500 uppercase tracking-wider">Operational Status</th>
+                                    <th class="px-6 py-3 font-bold text-slate-500 uppercase tracking-wider">QR</th>
                                     <th class="px-6 py-3 font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 <?php if (empty($items)): ?>
                                     <tr>
-                                        <td colspan="8" class="px-6 py-10 text-center text-slate-400">No inventory products verified in database.</td>
+                                        <td colspan="9" class="px-6 py-10 text-center text-slate-400">No inventory products verified in database.</td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($items as $item): 
@@ -250,6 +251,9 @@ function getStatusClass($status) {
                                                 <span class="status-badge <?php echo $status_badge; ?>" style="padding: 2px 8px; font-size: 0.65rem; border-radius: 999px;">
                                                     <?php echo htmlspecialchars($item['status']); ?>
                                                 </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <a href="qr_generator.php?item_id=<?php echo (int)$item['item_id']; ?>" target="_blank" class="text-blue-600 hover:underline text-xs">View QR</a>
                                             </td>
                                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                                 <div class="inline-flex gap-1">
