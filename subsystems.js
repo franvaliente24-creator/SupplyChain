@@ -469,3 +469,16 @@ function getModuleHref(subsystemId, moduleId) {
 function getDashboardHref(subsystemId) {
     return `dashboard.html?subsystem=${encodeURIComponent(subsystemId)}`;
 }
+const MODULE_PAGE_OVERRIDES = {
+    'supply-chain:svm': 'suppliers.php',
+    'supply-chain:pom': 'orders.php',
+    'supply-chain:dtrs': 'dtrs.php'
+};
+
+function getModuleHref(subsystemId, moduleId) {
+    const overrideKey = `${subsystemId}:${moduleId}`;
+    if (MODULE_PAGE_OVERRIDES[overrideKey]) {
+        return MODULE_PAGE_OVERRIDES[overrideKey];
+    }
+    return `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+}
