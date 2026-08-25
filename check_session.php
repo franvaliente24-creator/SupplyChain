@@ -29,24 +29,36 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
     $userId = (int)$_SESSION['user_id'];
     $email = $_SESSION['email'] ?? null;
     $username = $_SESSION['username'] ?? null;
+    
+    // Check for session timeout (30 minutes of inactivity)
+    $session_timeout = 30 * 60; // 30 minutes in seconds
+    if (isset($_SESSION['logged_in_at']) && (time() - $_SESSION['logged_in_at']) > $session_timeout) {
+        // Session expired, clear it
+        session_unset();
+        session_destroy();
+        // Proceed to remember me check below
+    } else {
+        // Update last activity time
+        $_SESSION['logged_in_at'] = time();
 
-    $stmt = $conn->prepare('SELECT user_id, username, email, role, is_active FROM users WHERE user_id = ? LIMIT 1');
-    $stmt->bind_param('i', $userId);
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        if ($result->num_rows === 1) {
-            $row = $result->fetch_assoc();
-            if ($row['is_active']) {
-                $loggedIn = true;
-                $email = $row['email'];
-                $username = $row['username'];
-                $role = $row['role'];
-                $_SESSION['username'] = $username;
+        $stmt = $conn->prepare('SELECT user_id, username, email, role, is_active FROM users WHERE user_id = ? LIMIT 1');
+        $stmt->bind_param('i', $userId);
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            if ($result->num_rows === 1) {
+                $row = $result->fetch_assoc();
+                if ($row['is_active']) {
+                    $loggedIn = true;
+                    $email = $row['email'];
+                    $username = $row['username'];
+                    $role = $row['role'];
+                    $_SESSION['username'] = $username;
+                }
             }
+            $result->free();
         }
-        $result->free();
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 if (!$loggedIn && !empty($_COOKIE['remember_token']) && !empty($_COOKIE['remember_uid'])) {

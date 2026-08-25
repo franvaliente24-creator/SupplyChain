@@ -8,36 +8,10 @@ $admin_user = $_SESSION['username'] ?? ($admin_user ?? 'Admin User');
 $user_role = $_SESSION['role'] ?? ($user_role ?? 'Supply Chain Manager');
 
 $sub_modules = [
-    ["name" => "Dashboard", "icon" => "dashboard", "href" => "dashboard.html?subsystem=supply-chain"],
-    [
-        "name" => "Smart Warehousing System (SWS)",
-        "icon" => "warehouse",
-        "href" => "warehouse.php",
-        "children" => [
-            ["name" => "Tech Assets", "href" => "tech_assets.php"],
-            ["name" => "Equipment Matching", "href" => "asset_assignments.php"],
-        ]
-    ],
-    [
-        "name" => "Inventory Management System (IMS)",
-        "icon" => "inventory_2",
-        "href" => "inventory.php",
-        "children" => [
-            ["name" => "Inventory Items", "href" => "inventory.php"],
-            ["name" => "Inventory Analytics", "href" => "inventory_dashboard.php"],
-            ["name" => "QR Scanner", "href" => "qr_scanner.php"],
-            ["name" => "Stock Requisitions", "href" => "stock_requisitions.php"],
-        ]
-    ],
-    [
-        "name" => "Procurement & Sourcing Management (PSM)",
-        "icon" => "shopping_bag",
-        "href" => "psm.php",
-        "children" => [
-            ["name" => "RFP Management", "href" => "rfp_management.php"],
-            ["name" => "Procurement Templates", "href" => "procurement_templates.php"],
-        ]
-    ],
+    ["name" => "Dashboard", "icon" => "dashboard", "href" => "dashboard.php"],
+    ["name" => "Smart Warehousing System (SWS)", "icon" => "warehouse", "href" => "warehouse.php"],
+    ["name" => "Inventory Management System", "icon" => "inventory_2", "href" => "inventory.php"],
+    ["name" => "Procurement & Sourcing Management (PSM)", "icon" => "shopping_bag", "href" => "psm.php"],
     [
         "name" => "Supplier / Vendor Management",
         "icon" => "handshake",
@@ -46,8 +20,6 @@ $sub_modules = [
             ["name" => "Vendor Directory", "href" => "suppliers.php"],
             ["name" => "Performance Scorecard", "href" => "supplier_performance.php"],
             ["name" => "Contracts & Compliance", "href" => "supplier_contracts.php"],
-            ["name" => "Supplier Documents", "href" => "supplier_documents.php"],
-            ["name" => "Supplier Reports", "href" => "supplier_reports.php"],
         ]
     ],
     [
@@ -58,7 +30,7 @@ $sub_modules = [
             ["name" => "Active Purchase Orders", "href" => "orders.php"],
             ["name" => "PO Approvals", "href" => "po_approvals.php"],
             ["name" => "Goods Receipt", "href" => "goods_receipt.php"],
-            ["name" => "PO QR Scanner", "href" => "po_scanner.php"],
+            ["name" => "Order History", "href" => "orders.php"],
         ]
     ],
     [
@@ -69,7 +41,6 @@ $sub_modules = [
             ["name" => "Shipment Manifests & Tracking", "href" => "dtrs.php"],
             ["name" => "Delivery Confirmation (POD)", "href" => "pod.php"],
             ["name" => "Document Repository", "href" => "document_repository.php"],
-            ["name" => "Track Documents", "href" => "document_tracking.php"],
             ["name" => "Carrier / 3PL Directory", "href" => "carriers.php"],
             ["name" => "Customs & Compliance Records", "href" => "customs_records.php"],
         ]
