@@ -73,6 +73,20 @@ function renderModulePage() {
                         <div class="sidebar-submenu" data-submenu-for="${mod.id}">
                             ${mod.subnav.map(sub => {
                                 const isSubActive = activeSubItemId === sub.id || (!activeSubItemId && sub.id === defaultViewId);
+                                // Real PHP-backed pages (SWS, IMS, PSM, SVM, POM, DTRS) declare
+                                // an `href` in subsystems.js — navigate straight there.
+                                // Mock/demo subsystems declare a `render` function name instead
+                                // and get rendered client-side here in module.html.
+                                if (sub.href) {
+                                    return `
+                                        <a href="${sub.href}"
+                                           class="sidebar-submenu-link ${isSubActive ? 'active' : ''}"
+                                           data-view="${sub.id}">
+                                            <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
+                                            <span class="truncate">${sub.label}</span>
+                                        </a>
+                                    `;
+                                }
                                 return `
                                     <a href="#"
                                        class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
@@ -378,6 +392,17 @@ function initSidebarSubmenus() {
             const currentModuleId = getModuleFromUrl();
             const isSameModule = isOnModulePage && currentModuleId === moduleId;
             
+            const firstSubmenuLinkEarly = group ? group.querySelector('.sidebar-submenu-link') : null;
+            const firstHrefEarly = firstSubmenuLinkEarly ? firstSubmenuLinkEarly.getAttribute('href') : null;
+
+            // Real PHP-backed module (SWS, IMS, PSM, SVM, POM, DTRS): its first
+            // submenu item points straight at a real page — go there directly,
+            // no accordion/in-page logic needed since we're leaving module.html.
+            if (firstHrefEarly && firstHrefEarly !== '#') {
+                window.location.href = firstHrefEarly;
+                return;
+            }
+
             // Toggle accordion
             if (group) {
                 const wasOpen = group.classList.contains('open');
@@ -416,6 +441,13 @@ function initSidebarSubmenus() {
     // Handle submenu link clicks
     document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+
+            // Real page link — let the browser navigate normally.
+            if (href && href !== '#') {
+                return;
+            }
+
             e.preventDefault();
             e.stopPropagation();
             
@@ -465,14 +497,16 @@ function initSidebarSubmenus() {
                 }
             }
             
-            // Build flyout content
+            // Build flyout content. Real PHP-backed items (declared with an
+            // `href` in subsystems.js) link straight to their real page;
+            // mock/demo items fall back to the module.html?...&view= shell.
             flyout.innerHTML = `
                 <div class="sidebar-flyout-header">${moduleName}</div>
                 ${subnavItems.map(sub => `
-                    <a href="${getModuleHref(getSubsystemFromUrl(), moduleId)}&view=${sub.id}" 
+                    <a href="${sub.href ? sub.href : `${getModuleHref(getSubsystemFromUrl(), moduleId)}&view=${sub.id}`}" 
                        class="sidebar-flyout-item ${sub.id === new URLSearchParams(window.location.search).get('view') ? 'active' : ''}"
                        data-view="${sub.id}"
-                       data-render="${sub.render}">
+                       data-render="${sub.render || ''}">
                         <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
                         <span>${sub.label}</span>
                     </a>
@@ -498,6 +532,14 @@ function initSidebarSubmenus() {
             // Handle flyout item clicks
             flyout.querySelectorAll('.sidebar-flyout-item').forEach(item => {
                 item.addEventListener('click', (e) => {
+                    const href = item.getAttribute('href');
+
+                    // Real page link — let the browser navigate normally.
+                    if (href && !href.startsWith('module.html')) {
+                        flyout.classList.remove('visible');
+                        return;
+                    }
+
                     const renderFunc = item.dataset.render;
                     if (renderFunc && window[renderFunc]) {
                         e.preventDefault();

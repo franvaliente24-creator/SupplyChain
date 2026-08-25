@@ -206,6 +206,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="sidebar-submenu" data-submenu-for="${mod.id}">
                         ${mod.subnav.map(sub => {
                             const isSubActive = sub.id === defaultViewId;
+                            // Real PHP-backed pages (SWS, IMS, PSM, SVM, POM, DTRS) declare
+                            // an `href` in subsystems.js — navigate straight there.
+                            // Mock/demo subsystems declare a `render` function name instead
+                            // and get rendered client-side inside module.html.
+                            if (sub.href) {
+                                return `
+                                    <a href="${sub.href}"
+                                       class="sidebar-submenu-link ${isSubActive ? 'active' : ''}"
+                                       data-view="${sub.id}">
+                                        <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
+                                        <span class="truncate">${sub.label}</span>
+                                    </a>
+                                `;
+                            }
                             return `
                                 <a href="#"
                                    class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
@@ -563,16 +577,21 @@ function initSidebarSubmenus() {
             if (group) {
                 group.classList.toggle('open');
             }
-            
-            // Navigate to the module with its default view
+
+            const firstSubmenuLink = group ? group.querySelector('.sidebar-submenu-link') : null;
+            const firstHref = firstSubmenuLink ? firstSubmenuLink.getAttribute('href') : null;
+
+            // Real PHP-backed module (SWS, IMS, PSM, SVM, POM, DTRS): the first
+            // submenu item points straight at its real page — go there directly.
+            if (firstHref && firstHref !== '#') {
+                window.location.href = firstHref;
+                return;
+            }
+
+            // Mock/demo subsystem: fall back to the client-rendered module.html shell.
             const subsystemId = getSubsystemFromUrl() || 'supply-chain';
-            const firstSubmenuLink = group.querySelector('.sidebar-submenu-link');
             const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
-            
-            // Construct URL directly
             const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
-            
-            // Full page navigation to the module
             window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
         });
     });
@@ -580,6 +599,13 @@ function initSidebarSubmenus() {
     // Handle submenu link clicks
     document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+
+            // Real page link — let the browser navigate normally.
+            if (href && href !== '#') {
+                return;
+            }
+
             e.preventDefault();
             e.stopPropagation();
             

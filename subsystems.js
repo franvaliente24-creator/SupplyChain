@@ -1,3 +1,10 @@
+/**
+ * ==========================================================================
+ * Subsystems Registry & Module Definitions (subsystems.js)
+ * Full ISMERS Enterprise Subsystem Matrix (All 10 Core Transactions)
+ * ==========================================================================
+ */
+
 const SUBSYSTEMS = [
     {
         id: 'client-management',
@@ -188,8 +195,8 @@ const SUBSYSTEMS = [
             { label: 'Vendor Score', value: '4.6/5', icon: 'thumb_up', tone: 'positive', trend: [4.2, 4.3, 4.4, 4.5, 4.5, 4.6] }
         ],
         criticalAlerts: [
-            { type: 'low-stock', title: 'Low Stock Alert', message: '12 items below safety stock threshold', severity: 'high', items: ['SKU-001: Widget A (3 units)', 'SKU-045: Component B (5 units)', 'SKU-089: Part C (2 units)'] },
-            { type: 'delayed-shipment', title: 'Delayed Shipments', message: '6 shipments at risk of delay', severity: 'medium', items: ['PO-1234: Supplier Alpha (2 days late)', 'PO-1256: Supplier Beta (1 day late)', 'PO-1289: Supplier Gamma (at risk)'] }
+            { type: 'low-stock', title: 'Low Stock Alert', message: '12 items below safety stock threshold', severity: 'high', items: ['SYS-1042: Barcode Scanner Unit (8 pcs)', 'SYS-1077: Packing Tape Roll (0 box)'] },
+            { type: 'delayed-shipment', title: 'Delayed Shipments', message: '2 shipments at risk of delay', severity: 'medium', items: ['MNF-2026-021: Batangas Hub Logistics', 'MNF-2026-022: Metro Manila Supply Co.'] }
         ],
         quickActions: [
             'Approve purchase orders',
@@ -202,106 +209,69 @@ const SUBSYSTEMS = [
                 id: 'sws',
                 name: 'Smart Warehousing System (SWS)',
                 subnav: [
-                    { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', render: 'renderSWSWorkspace' },
-                    { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', render: 'renderSWSBinLookup' },
-                    { id: 'task-queues', label: 'Task Queues', icon: 'assignment', render: 'renderSWSTaskQueues' },
-                    { id: 'cycle-count', label: 'Cycle Count', icon: 'fact_check', render: 'renderSWSCycleCount' }
-                ],
-                functions: [
-                    { name: 'generateAssetQR', description: 'Generates a printable QR code for an asset/bin/locker.' },
-                    { name: 'scanAssetQR', description: 'Looks up an asset by scanned QR code and returns its current zone/location.' },
-                    { name: 'updateAssetZone', description: 'Moves an asset to a new zone category and logs the change.' },
-                    { name: 'getWarehouseCapacity', description: 'Returns current utilization per zone for the capacity view.' }
+                    { id: 'tech-assets', label: 'Tech Assets', icon: 'inventory', href: 'tech_assets.php' },
+                    { id: 'asset-assignments', label: 'Equipment Matching', icon: 'person_add', href: 'asset_assignments.php' }
                 ]
             },
             {
                 id: 'ims',
                 name: 'Inventory Management System (IMS)',
                 subnav: [
-                    { id: 'item-master', label: 'Item Master', icon: 'inventory', render: 'renderIMSWorkspace' },
-                    { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', render: 'renderIMSStockLevels' },
-                    { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', render: 'renderIMSUtilizationOverview' },
-                    { id: 'adjustments', label: 'Adjustments', icon: 'tune', render: 'renderIMSAdjustmentWorkflow' },
-                    { id: 'asset-disposition', label: 'Asset Disposition', icon: 'sync_alt', render: 'renderIMSAvailable' }
-                ],
-                functions: [
-                    { name: 'checkReorderAlerts', description: 'Returns items below reorder threshold for restocking.' },
-                    { name: 'adjustStockCount', description: 'Updates stock quantity with reason and timestamp.' },
-                    { name: 'trackLicenseRenewals', description: 'Tracks software license expiration dates and renewal schedules.' },
-                    { name: 'getStockMovementHistory', description: 'Returns historical stock movement log for an SKU.' }
+                    { id: 'inventory-items', label: 'Inventory Items', icon: 'inventory_2', href: 'inventory.php' },
+                    { id: 'inventory-dashboard', label: 'Inventory Analytics', icon: 'insights', href: 'inventory_dashboard.php' },
+                    { id: 'qr-scanner', label: 'QR Scanner', icon: 'qr_code_scanner', href: 'qr_scanner.php' },
+                    { id: 'stock-requisitions', label: 'Stock Requisitions', icon: 'assignment', href: 'stock_requisitions.php' }
                 ]
             },
             {
                 id: 'psm',
                 name: 'Procurement & Sourcing Management (PSM)',
                 subnav: [
-                    { id: 'requisitions', label: 'Requisitions', icon: 'description', render: 'renderPSMWorkspace' },
-                    { id: 'rfqs', label: 'RFQs', icon: 'request_quote', render: 'renderPSMRFQ' },
-                    { id: 'sourcing', label: 'Sourcing', icon: 'handshake', render: 'renderPSMSourcingPipeline' },
-                    { id: 'spend', label: 'Spend', icon: 'payments', render: 'renderPSMSpendAnalytics' }
-                ],
-                functions: [
-                    { name: 'checkBudgetAllocation', description: 'Checks if requested amount is within available budget.' },
-                    { name: 'compareVendorQuotes', description: 'Compares price and lead time from multiple vendors.' },
-                    { name: 'routeApprovalWorkflow', description: 'Routes requisition to appropriate approver based on amount.' },
-                    { name: 'createRequisition', description: 'Creates a new requisition with pending status.' }
+                    { id: 'rfp-management', label: 'RFP Management', icon: 'request_quote', href: 'rfp_management.php' },
+                    { id: 'procurement-templates', label: 'Procurement Templates', icon: 'folder_special', href: 'procurement_templates.php' }
                 ]
             },
             {
                 id: 'svm',
                 name: 'Supplier / Vendor Management (SVM)',
                 subnav: [
-                    { id: 'supplier-directory', label: 'Supplier Directory', icon: 'contacts', render: 'renderSVMWorkspace' },
-                    { id: 'scorecards', label: 'Scorecards', icon: 'assessment', render: 'renderSVMScorecards' },
-                    { id: 'compliance', label: 'Compliance', icon: 'verified_user', render: 'renderSVMCompliance' },
-                    { id: 'onboarding', label: 'Onboarding', icon: 'person_add', render: 'renderSVMOnboarding' }
-                ],
-                functions: [
-                    { name: 'calculateVendorScorecard', description: 'Calculates KPIs including lead time, defect rate, and overall score.' },
-                    { name: 'getVendorContracts', description: 'Returns contract types and expiry status for a vendor.' },
-                    { name: 'rateCourierPerformance', description: 'Rates courier services by on-time delivery and damage rate.' }
+                    { id: 'suppliers-list', label: 'Supplier Directory', icon: 'handshake', href: 'suppliers.php' },
+                    { id: 'supplier-performance', label: 'Performance & Ratings', icon: 'star', href: 'supplier_performance.php' },
+                    { id: 'supplier-contracts', label: 'Contracts & SLA', icon: 'description', href: 'supplier_contracts.php' },
+                    { id: 'supplier-docs', label: 'Supplier Documents', icon: 'folder', href: 'supplier_documents.php' },
+                    { id: 'supplier-reports', label: 'Supplier Reports', icon: 'bar_chart', href: 'supplier_reports.php' }
                 ]
             },
             {
                 id: 'pom',
                 name: 'Purchase Order Management (POM)',
                 subnav: [
-                    { id: 'po-pipeline', label: 'PO Pipeline', icon: 'view_list', render: 'renderPOMWorkspace' },
-                    { id: 'po-creation', label: 'PO Creation', icon: 'add_circle', render: 'renderPOMCreation' },
-                    { id: 'grn', label: 'GRN', icon: 'inventory', render: 'renderPOMGRN' },
-                    { id: 'overdue', label: 'Overdue', icon: 'warning', render: 'renderPOMOverdue' }
-                ],
-                functions: [
-                    { name: 'createPurchaseOrder', description: 'Creates a new purchase order with draft status.' },
-                    { name: 'getPOStatusPipeline', description: 'Returns POs grouped by status (draft, approved, sent, etc.).' },
-                    { name: 'matchThreeWay', description: 'Compares PO, goods receipt, and invoice for payment matching.' },
-                    { name: 'flagOverduePOs', description: 'Returns POs past expected delivery date.' }
+                    { id: 'po-list', label: 'Purchase Orders', icon: 'receipt_long', href: 'orders.php' },
+                    { id: 'po-approvals', label: 'PO Approvals', icon: 'task_alt', href: 'po_approvals.php' },
+                    { id: 'goods-receipt', label: 'Goods Receipt', icon: 'inventory', href: 'goods_receipt.php' },
+                    { id: 'po-scanner', label: 'PO QR Scanner', icon: 'qr_code_scanner', href: 'po_scanner.php' }
                 ]
             },
             {
                 id: 'dtrs',
                 name: 'Document Tracking & Logistics Records System (DTRS)',
                 subnav: [
-                    { id: 'shipment-tracking', label: 'Shipment Tracking', icon: 'local_shipping', render: 'renderDTRSWorkspace' },
-                    { id: 'documents', label: 'Documents', icon: 'folder', render: 'renderDTRSDocuments' },
-                    { id: 'delivery', label: 'Delivery', icon: 'check_circle', render: 'renderDTRSDelivery' },
-                    { id: 'exceptions', label: 'Exceptions', icon: 'error', render: 'renderDTRSExceptions' }
-                ],
-                functions: [
-                    { name: 'generateWaybillQR', description: 'Generates QR-coded waybill for shipment tracking.' },
-                    { name: 'logChainOfCustody', description: 'Logs chain of custody events with timestamp and actor.' },
-                    { name: 'recordAccountabilitySignature', description: 'Records digital signature for accountability forms.' },
-                    { name: 'trackAssetReturn', description: 'Logs asset return shipment and status.' }
+                    { id: 'manifests', label: 'Shipping Manifests', icon: 'local_shipping', href: 'dtrs.php' },
+                    { id: 'pod', label: 'Delivery Confirmation (POD)', icon: 'assignment_turned_in', href: 'pod.php' },
+                    { id: 'doc-repo', label: 'Document Repository', icon: 'folder_open', href: 'document_repository.php' },
+                    { id: 'doc-tracking', label: 'Track Documents', icon: 'track_changes', href: 'document_tracking.php' },
+                    { id: 'carriers', label: 'Carrier Directory', icon: 'directions_bus', href: 'carriers.php' },
+                    { id: 'customs', label: 'Customs & Compliance', icon: 'gavel', href: 'customs_records.php' }
                 ]
             }
         ],
         activity: [
-            { label: 'New shipment logged', time: '3 hours ago', status: 'In transit', category: 'Shipments' },
-            { label: 'Stock count completed', time: 'Today', status: 'Verified', category: 'Inventory' },
-            { label: 'Vendor performance reviewed', time: 'Yesterday', status: 'Updated', category: 'Vendors' },
-            { label: 'PO approval pending', time: '2 hours ago', status: 'Pending', category: 'Shipments' },
-            { label: 'Inventory adjustment made', time: 'Today', status: 'Completed', category: 'Inventory' },
-            { label: 'New supplier onboarded', time: 'Yesterday', status: 'New', category: 'Vendors' }
+            { label: 'Purchase Order PO-2026-089 approved by Procurement', time: '10 mins ago', status: 'Approved', category: 'Shipments' },
+            { label: 'Stock count verified in Zone A', time: 'Today', status: 'Verified', category: 'Inventory' },
+            { label: 'Vendor performance reviewed for Batangas Hub', time: 'Yesterday', status: 'Updated', category: 'Vendors' },
+            { label: 'Customs record logged for Manifest #MNF-2026-021', time: '2 hours ago', status: 'Pending', category: 'Shipments' },
+            { label: 'New inventory item added: Steel Pallet Rack', time: 'Today', status: 'Completed', category: 'Inventory' },
+            { label: 'New carrier registered: Metro Manila Express', time: 'Yesterday', status: 'New', category: 'Vendors' }
         ]
     },
     {
@@ -316,7 +286,7 @@ const SUBSYSTEMS = [
             { label: 'On-time Deliveries', value: '97%', icon: 'schedule', tone: 'positive' }
         ],
         quickActions: [
-            ' dispatch new route',
+            'Dispatch new route',
             'Assign driver shifts',
             'Log fuel consumption',
             'Review vehicle service history'
@@ -430,13 +400,15 @@ const SUBSYSTEMS = [
     }
 ];
 
+// Helper Functions
 function getSubsystemById(id) {
-    return SUBSYSTEMS.find(subsytem => subsytem.id === id);
+    const targetId = id || 'supply-chain';
+    return SUBSYSTEMS.find(subsystem => subsystem.id === targetId) || SUBSYSTEMS.find(s => s.id === 'supply-chain');
 }
 
 function getSubsystemFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('subsystem');
+    return params.get('subsystem') || 'supply-chain';
 }
 
 function getModuleFromUrl() {
@@ -447,9 +419,8 @@ function getModuleFromUrl() {
 function normalizeModule(module) {
     if (typeof module === 'string') {
         const id = module.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        return { id, name: module, description: '', features: [] };
+        return { id, name: module, description: '', subnav: [] };
     }
-    // Preserve subnav property if it exists
     return module;
 }
 
@@ -462,10 +433,9 @@ function getModuleById(subsystemId, moduleId) {
 }
 
 function getModuleHref(subsystemId, moduleId) {
-    // All modules now use the shared module.html template
     return `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
 }
 
 function getDashboardHref(subsystemId) {
-    return `dashboard.html?subsystem=${encodeURIComponent(subsystemId)}`;
+    return `dashboard.html?subsystem=${encodeURIComponent(subsystemId || 'supply-chain')}`;
 }
