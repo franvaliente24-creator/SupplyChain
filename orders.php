@@ -1,7 +1,7 @@
 ﻿<?php
 session_start();
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
+    header("Location: index.html");
     exit();
 }
 
@@ -264,6 +264,7 @@ $editable_statuses_json = json_encode($editable_statuses);
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <?php include 'header.php'; ?>
         <main class="flex-1 overflow-y-auto bg-surface-dim p-3 sm:p-6 md:p-10 text-on-surface antialiased overflow-x-hidden w-full max-w-full">
             <div class="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 min-w-0">
 
@@ -622,7 +623,7 @@ $editable_statuses_json = json_encode($editable_statuses);
                             <span>${it.quantity}</span>
                             <span>₱${parseFloat(it.unit_price).toFixed(2)}</span>
                             <span>${it.quantity_received || 0}</span>
-                            <span></span>
+                            <span>₱${(it.quantity_received || 0) * parseFloat(it.unit_price).toFixed(2)}</span>
                         `;
                         container.appendChild(row);
                     });

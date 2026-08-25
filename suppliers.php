@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
+    header("Location: index.html");
     exit();
 }
 
@@ -156,13 +156,8 @@ if (!$conn->connect_error) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">ISMERS Procurement Cluster</span>
-            </div>
-        </header>
-
-        <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
+        <?php include 'header.php'; ?>
+<main class="flex-1 overflow-y-auto bg-surface-container-lowest p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -213,13 +208,13 @@ if (!$conn->connect_error) {
                                             <td class="px-6 py-4 font-bold text-slate-900">
                                                 <?php echo htmlspecialchars($sup['supplier_name']); ?>
                                                 <div class="mt-1">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-500 bg-slate-100 border border-slate-200"><?php echo htmlspecialchars($sup['vendor_type']); ?></span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-500 bg-slate-100 border border-slate-200"><?php echo htmlspecialchars($sup['vendor_type'] ?: 'Uncategorized'); ?></span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-slate-700 font-medium"><?php echo htmlspecialchars($sup['contact_person'] ?: '—'); ?></td>
                                             <td class="px-6 py-4 space-y-0.5">
-                                                <div class="text-slate-900 font-medium"><?php echo htmlspecialchars($sup['email']); ?></div>
-                                                <div class="text-slate-400 font-mono text-[10px]"><?php echo htmlspecialchars($sup['phone']); ?></div>
+                                                <div class="text-slate-900 font-medium"><?php echo htmlspecialchars($sup['email'] ?: '—'); ?></div>
+                                                <div class="text-slate-400 font-mono text-[10px]"><?php echo htmlspecialchars($sup['phone'] ?: '—'); ?></div>
                                             </td>
                                             <td class="px-6 py-4 text-slate-500 max-w-xs truncate"><?php echo htmlspecialchars($sup['address'] ?: '—'); ?></td>
                                             <td class="px-6 py-4">

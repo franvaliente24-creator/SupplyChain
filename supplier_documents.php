@@ -188,13 +188,8 @@ function getStatusBadgeClass($status) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">Supplier / Vendor Management</span>
-            </div>
-        </header>
-
-        <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
+        <?php include 'header.php'; ?>
+<main class="flex-1 overflow-y-auto bg-surface-container-lowest p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>

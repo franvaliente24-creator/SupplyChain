@@ -1,8 +1,8 @@
 <?php
 // filepath: c:\xampp\htdocs\SupplyChain\login.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
 header('Content-Type: application/json');
 
@@ -34,12 +34,18 @@ if (!$email || !$password) {
 }
 
 // Check if the email exists in the database
-$stmt = $conn->prepare('SELECT user_id, username, password_hash FROM users WHERE email = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT user_id, username, password_hash, role FROM users WHERE email = ? LIMIT 1');
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(['message' => 'Server error. Please try again later.']);
+    exit;
+}
 $stmt->bind_param('s', $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
+    $stmt->close();
     http_response_code(401);
     echo json_encode(['message' => 'Invalid email or password.']);
     exit;
@@ -53,24 +59,30 @@ $stmt->close();
 
 // Verify the password
 if (!password_verify($password, $hashedPassword)) {
-    // Log failed login attempt to activity log
+    // Log failed login attempt to activity log (best-effort, never fatal)
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
-    $log_stmt->bind_param("issss", $userId, $username, 'Failed Login', 'Invalid password attempt', $ip_address, $user_agent);
-    $log_stmt->execute();
-    $log_stmt->close();
-    
+    if ($log_stmt) {
+        $log_stmt->bind_param("issss", $userId, $username, $failedAction, $failedDetails, $ip_address, $user_agent);
+        $failedAction = 'Failed Login';
+        $failedDetails = 'Invalid password attempt';
+        $log_stmt->execute();
+        $log_stmt->close();
+    }
+
     // Log to login_history table if it exists
     $login_history_check = $conn->query("SHOW TABLES LIKE 'login_history'");
     if ($login_history_check && $login_history_check->num_rows > 0) {
         $history_stmt = $conn->prepare("INSERT INTO login_history (user_id, username, ip_address, user_agent, login_status, failure_reason) VALUES (?, ?, ?, ?, 'failed', 'Invalid password')");
-        $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
-        $history_stmt->execute();
-        $history_stmt->close();
+        if ($history_stmt) {
+            $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
+            $history_stmt->execute();
+            $history_stmt->close();
+        }
     }
-    $login_history_check->free();
-    
+    if ($login_history_check) $login_history_check->free();
+
     http_response_code(401);
     echo json_encode(['message' => 'Invalid email or password.']);
     exit;
@@ -84,30 +96,50 @@ $_SESSION['user_id'] = $userId;
 $_SESSION['logged_in_at'] = time();
 $_SESSION['email'] = $email;
 $_SESSION['username'] = $username;
+$_SESSION['role'] = $row['role'] ?? null;
 
-// Log successful login
+// Log successful login (best-effort, never fatal)
 $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
-$log_stmt->bind_param("issss", $userId, $username, 'Successful Login', 'User logged in successfully', $ip_address, $user_agent);
-$log_stmt->execute();
-$log_stmt->close();
+if ($log_stmt) {
+    $successAction = 'Successful Login';
+    $successDetails = 'User logged in successfully';
+    $log_stmt->bind_param("issss", $userId, $username, $successAction, $successDetails, $ip_address, $user_agent);
+    $log_stmt->execute();
+    $log_stmt->close();
+}
 
 // Log to login_history table if it exists
 $login_history_check = $conn->query("SHOW TABLES LIKE 'login_history'");
 if ($login_history_check && $login_history_check->num_rows > 0) {
     $history_stmt = $conn->prepare("INSERT INTO login_history (user_id, username, ip_address, user_agent, login_status) VALUES (?, ?, ?, ?, 'success')");
-    $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
-    $history_stmt->execute();
-    $history_stmt->close();
+    if ($history_stmt) {
+        $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
+        $history_stmt->execute();
+        $history_stmt->close();
+    }
 }
-$login_history_check->free();
+if ($login_history_check) $login_history_check->free();
 
-// Update last_login in users table
-$update_stmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
-$update_stmt->bind_param("i", $userId);
-$update_stmt->execute();
-$update_stmt->close();
+// Update last_login in users table — only if the column actually exists.
+// (schema_updates.sql leaves this as a commented-out manual ALTER TABLE,
+// so on a fresh install this column may not exist yet.)
+$hasLastLogin = false;
+$colCheck = $conn->query("SHOW COLUMNS FROM users LIKE 'last_login'");
+if ($colCheck && $colCheck->num_rows > 0) {
+    $hasLastLogin = true;
+}
+if ($colCheck) $colCheck->free();
+
+if ($hasLastLogin) {
+    $update_stmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
+    if ($update_stmt) {
+        $update_stmt->bind_param("i", $userId);
+        $update_stmt->execute();
+        $update_stmt->close();
+    }
+}
 
 // Handle Remember Me - set a persistent cookie valid for 30 days
 $rememberTableExists = false;
@@ -123,16 +155,20 @@ if ($rememberMe) {
 
     if ($rememberTableExists) {
         $delStmt = $conn->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
-        $delStmt->bind_param('i', $userId);
-        $delStmt->execute();
-        $delStmt->close();
+        if ($delStmt) {
+            $delStmt->bind_param('i', $userId);
+            $delStmt->execute();
+            $delStmt->close();
+        }
 
         $hashedToken = hash('sha256', $rememberToken);
         $insStmt = $conn->prepare('INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)');
-        $expiresAt = date('Y-m-d H:i:s', $rememberExpires);
-        $insStmt->bind_param('iss', $userId, $hashedToken, $expiresAt);
-        $insStmt->execute();
-        $insStmt->close();
+        if ($insStmt) {
+            $expiresAt = date('Y-m-d H:i:s', $rememberExpires);
+            $insStmt->bind_param('iss', $userId, $hashedToken, $expiresAt);
+            $insStmt->execute();
+            $insStmt->close();
+        }
     }
 
     setcookie(
@@ -183,4 +219,3 @@ echo json_encode([
     'redirect' => 'dashboard.html',
     'remember_me' => $rememberMe
 ]);
-?>
