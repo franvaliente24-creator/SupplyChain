@@ -23,7 +23,7 @@ if (count($header_name_parts) > 1 && $header_name_parts[0] !== '' && $header_nam
 ?>
 <header class="bg-surface/80 backdrop-blur-md shadow-sm border-b border-outline-variant/30 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
     <div class="flex items-center gap-3">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f1f5f9'/%3E%3Cpath d='M10 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm12 6H10l4-5 2.5 3 2-2.5 3.5 4.5z' fill='%23cbd5e1'/%3E%3C/svg%3E" alt="Supply Chain Logo" class="w-8 h-8 rounded-lg object-cover border border-outline-variant/30 shadow-2xs shrink-0">
+        <img src="img/logo.png" alt="Supply Chain Logo" class="w-8 h-8 rounded-lg object-cover border border-outline-variant/30 shadow-2xs shrink-0">
         <button id="desktop-sidebar-toggle" type="button" class="flex items-center justify-center p-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low focus:outline-none transition border border-outline-variant/30 shrink-0 min-w-[2.5rem] min-h-[2.5rem]" title="Close Sidebar">
             <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">menu_open</span>
         </button>

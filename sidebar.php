@@ -92,8 +92,8 @@ function sidebar_module_is_active($mod, $current_page) {
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
         <div class="sidebar-brand-section">
             <div class="sidebar-brand-card">
-                <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-primary text-xl">local_shipping</span>
+                <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src="img/logo.png" alt="Supply Chain Logo" class="w-full h-full object-cover"/>
                 </div>
                 <div class="sidebar-brand-title">Supply Chain</div>
                 <div class="sidebar-brand-subtitle">Supply Chain &amp; Inventory</div>
