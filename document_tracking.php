@@ -31,14 +31,16 @@ if ($table_exists && !$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'PO
         $stmt = $conn->prepare("INSERT INTO document_tracking (tracking_number, document_type, recipient_name, recipient_address, current_status, created_by, expected_delivery_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         
         $expected_delivery = !empty($_POST['expected_delivery_date']) ? $_POST['expected_delivery_date'] : null;
+        $initial_status = 'Created';
+        $created_by = (int)$_SESSION['user_id'];
         
-        $stmt->bind_param("sssssisss", 
+        $stmt->bind_param("sssssiss", 
             $tracking_number,
             $_POST['document_type'],
             $_POST['recipient_name'],
             $_POST['recipient_address'],
-            'Created',
-            (int)$_SESSION['user_id'],
+            $initial_status,
+            $created_by,
             $expected_delivery,
             $_POST['notes']
         );

@@ -24,21 +24,21 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'add') {
         $stmt = $conn->prepare("INSERT INTO supplier_documents
-            (supplier_id, doc_type, doc_reference, file_path, issued_date, expires_date)
-            VALUES (?, ?, ?, ?, ?, ?)");
+            (supplier_id, document_type, document_name, file_path, upload_date, expiry_date, status, uploaded_by)
+            VALUES (?, ?, ?, ?, CURDATE(), ?, 'Active', ?)");
         $supplier_id = (int)$_POST['supplier_id'];
-        $doc_reference = $_POST['doc_reference'] !== '' ? $_POST['doc_reference'] : null;
+        $document_name = $_POST['doc_reference'] !== '' ? $_POST['doc_reference'] : $_POST['doc_type'];
         $file_path = $_POST['file_path'] !== '' ? $_POST['file_path'] : null;
-        $issued_date = $_POST['issued_date'] !== '' ? $_POST['issued_date'] : null;
-        $expires_date = $_POST['expires_date'] !== '' ? $_POST['expires_date'] : null;
+        $expiry_date = $_POST['expires_date'] !== '' ? $_POST['expires_date'] : null;
+        $uploaded_by = (int)$_SESSION['user_id'];
         $stmt->bind_param(
-            "isssss",
+            "issssi",
             $supplier_id,
             $_POST['doc_type'],
-            $doc_reference,
+            $document_name,
             $file_path,
-            $issued_date,
-            $expires_date
+            $expiry_date,
+            $uploaded_by
         );
         if ($stmt->execute()) {
             $flash = "Document added successfully.";
@@ -50,7 +50,7 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete') {
         $doc_id = (int)$_POST['doc_id'];
-        $stmt = $conn->prepare("DELETE FROM supplier_documents WHERE doc_id = ?");
+        $stmt = $conn->prepare("DELETE FROM supplier_documents WHERE document_id = ?");
         $stmt->bind_param("i", $doc_id);
         if ($stmt->execute()) {
             $flash = "Document removed.";
@@ -74,16 +74,16 @@ if (!$conn->connect_error) {
         }
     }
 
-    $sql = "SELECT d.doc_id, d.supplier_id, d.doc_type, d.doc_reference, d.file_path,
-                   d.issued_date, d.expires_date, s.supplier_name,
-                   DATEDIFF(d.expires_date, CURDATE()) AS days_to_expiry
+    $sql = "SELECT d.document_id, d.supplier_id, d.document_type, d.document_name, d.file_path,
+                   d.upload_date, d.expiry_date, s.supplier_name,
+                   DATEDIFF(d.expiry_date, CURDATE()) AS days_to_expiry
             FROM supplier_documents d
             JOIN suppliers s ON d.supplier_id = s.supplier_id
-            ORDER BY (d.expires_date IS NULL), d.expires_date ASC";
+            ORDER BY (d.expiry_date IS NULL), d.expiry_date ASC";
     $result = $conn->query($sql);
     if ($result) {
         while ($row = $result->fetch_assoc()) {
-            if ($row['expires_date'] !== null) {
+            if ($row['expiry_date'] !== null) {
                 if ((int)$row['days_to_expiry'] < 0) {
                     $expiredCount++;
                 } elseif ((int)$row['days_to_expiry'] <= 30) {
@@ -166,7 +166,7 @@ if (!$conn->connect_error) {
                                     <tr><td colspan="7" class="px-6 py-8 text-center text-xs text-slate-400">No documents on file yet.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($documents as $d):
-                                        $days = $d['expires_date'] !== null ? (int)$d['days_to_expiry'] : null;
+                                        $days = $d['expiry_date'] !== null ? (int)$d['days_to_expiry'] : null;
                                         if ($days === null) {
                                             $statusLabel = 'No expiry';
                                             $statusClass = 'text-slate-600 bg-slate-100 border-slate-200';
@@ -183,17 +183,17 @@ if (!$conn->connect_error) {
                                     ?>
                                         <tr class="hover:bg-slate-50/50 transition-colors">
                                             <td class="px-6 py-4 text-xs font-medium text-slate-900"><?php echo htmlspecialchars($d['supplier_name']); ?></td>
-                                            <td class="px-6 py-4 text-xs text-slate-600"><?php echo htmlspecialchars($d['doc_type']); ?></td>
-                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo htmlspecialchars($d['doc_reference'] ?? '—'); ?></td>
-                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo $d['issued_date'] ? date("M j, Y", strtotime($d['issued_date'])) : '—'; ?></td>
-                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo $d['expires_date'] ? date("M j, Y", strtotime($d['expires_date'])) : '—'; ?></td>
+                                            <td class="px-6 py-4 text-xs text-slate-600"><?php echo htmlspecialchars($d['document_type']); ?></td>
+                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo htmlspecialchars($d['document_name'] ?? '—'); ?></td>
+                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo $d['upload_date'] ? date("M j, Y", strtotime($d['upload_date'])) : '—'; ?></td>
+                                            <td class="px-6 py-4 text-xs text-slate-500"><?php echo $d['expiry_date'] ? date("M j, Y", strtotime($d['expiry_date'])) : '—'; ?></td>
                                             <td class="px-6 py-4 text-xs">
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-semibold border <?php echo $statusClass; ?>"><?php echo $statusLabel; ?></span>
                                             </td>
                                             <td class="px-6 py-4 text-xs">
                                                 <form method="POST" onsubmit="return confirm('Remove this document?');" class="inline">
                                                     <input type="hidden" name="action" value="delete"/>
-                                                    <input type="hidden" name="doc_id" value="<?php echo (int)$d['doc_id']; ?>"/>
+                                                    <input type="hidden" name="doc_id" value="<?php echo (int)$d['document_id']; ?>"/>
                                                     <button type="submit" class="text-rose-500 hover:text-rose-700" title="Delete">
                                                         <span class="material-symbols-outlined text-base">delete</span>
                                                     </button>
@@ -240,15 +240,9 @@ if (!$conn->connect_error) {
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Reference Number</label>
                     <input type="text" name="doc_reference" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2" placeholder="e.g. DTI-2026-000123"/>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Issued Date</label>
-                        <input type="date" name="issued_date" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2"/>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Expiry Date</label>
-                        <input type="date" name="expires_date" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2"/>
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Expiry Date</label>
+                    <input type="date" name="expires_date" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2"/>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">File Path / Reference</label>
