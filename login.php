@@ -3,7 +3,6 @@
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
-
 header('Content-Type: application/json');
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -18,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require 'db_connection.php'; // Include your database connection
+require 'db_connection.php';
 
 // Get the JSON data from the request
 $data = json_decode(file_get_contents('php://input'), true);
@@ -63,26 +62,20 @@ if (!password_verify($password, $hashedPassword)) {
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
-    if ($log_stmt) {
-        $log_stmt->bind_param("issss", $userId, $username, $failedAction, $failedDetails, $ip_address, $user_agent);
-        $failedAction = 'Failed Login';
-        $failedDetails = 'Invalid password attempt';
-        $log_stmt->execute();
-        $log_stmt->close();
-    }
-
+    $log_stmt->bind_param("issss", $userId, $username, 'Failed Login', 'Invalid password attempt', $ip_address, $user_agent);
+    $log_stmt->execute();
+    $log_stmt->close();
+    
     // Log to login_history table if it exists
     $login_history_check = $conn->query("SHOW TABLES LIKE 'login_history'");
     if ($login_history_check && $login_history_check->num_rows > 0) {
         $history_stmt = $conn->prepare("INSERT INTO login_history (user_id, username, ip_address, user_agent, login_status, failure_reason) VALUES (?, ?, ?, ?, 'failed', 'Invalid password')");
-        if ($history_stmt) {
-            $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
-            $history_stmt->execute();
-            $history_stmt->close();
-        }
+        $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
+        $history_stmt->execute();
+        $history_stmt->close();
     }
-    if ($login_history_check) $login_history_check->free();
-
+    $login_history_check->free();
+    
     http_response_code(401);
     echo json_encode(['message' => 'Invalid email or password.']);
     exit;
@@ -98,48 +91,29 @@ $_SESSION['email'] = $email;
 $_SESSION['username'] = $username;
 $_SESSION['role'] = $row['role'] ?? null;
 
-// Log successful login (best-effort, never fatal)
+// Log successful login
 $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
-if ($log_stmt) {
-    $successAction = 'Successful Login';
-    $successDetails = 'User logged in successfully';
-    $log_stmt->bind_param("issss", $userId, $username, $successAction, $successDetails, $ip_address, $user_agent);
-    $log_stmt->execute();
-    $log_stmt->close();
-}
+$log_stmt->bind_param("issss", $userId, $username, 'Successful Login', 'User logged in successfully', $ip_address, $user_agent);
+$log_stmt->execute();
+$log_stmt->close();
 
 // Log to login_history table if it exists
 $login_history_check = $conn->query("SHOW TABLES LIKE 'login_history'");
 if ($login_history_check && $login_history_check->num_rows > 0) {
     $history_stmt = $conn->prepare("INSERT INTO login_history (user_id, username, ip_address, user_agent, login_status) VALUES (?, ?, ?, ?, 'success')");
-    if ($history_stmt) {
-        $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
-        $history_stmt->execute();
-        $history_stmt->close();
-    }
+    $history_stmt->bind_param("isss", $userId, $username, $ip_address, $user_agent);
+    $history_stmt->execute();
+    $history_stmt->close();
 }
-if ($login_history_check) $login_history_check->free();
+$login_history_check->free();
 
-// Update last_login in users table — only if the column actually exists.
-// (schema_updates.sql leaves this as a commented-out manual ALTER TABLE,
-// so on a fresh install this column may not exist yet.)
-$hasLastLogin = false;
-$colCheck = $conn->query("SHOW COLUMNS FROM users LIKE 'last_login'");
-if ($colCheck && $colCheck->num_rows > 0) {
-    $hasLastLogin = true;
-}
-if ($colCheck) $colCheck->free();
-
-if ($hasLastLogin) {
-    $update_stmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
-    if ($update_stmt) {
-        $update_stmt->bind_param("i", $userId);
-        $update_stmt->execute();
-        $update_stmt->close();
-    }
-}
+// Update last_login in users table
+$update_stmt = $conn->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
+$update_stmt->bind_param("i", $userId);
+$update_stmt->execute();
+$update_stmt->close();
 
 // Handle Remember Me - set a persistent cookie valid for 30 days
 $rememberTableExists = false;
@@ -204,14 +178,11 @@ if ($rememberMe) {
             $delStmt->close();
         }
     }
-
     if (isset($_COOKIE['remember_token'])) {
         setcookie('remember_token', '', time() - 3600, '/');
         setcookie('remember_uid', '', time() - 3600, '/');
     }
 }
-
-$conn->close();
 
 // Return a success response
 echo json_encode([
@@ -219,3 +190,4 @@ echo json_encode([
     'redirect' => 'dashboard.html',
     'remember_me' => $rememberMe
 ]);
+?>
