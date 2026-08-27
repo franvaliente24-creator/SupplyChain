@@ -57,6 +57,7 @@ $sub_modules = [
             ["name" => "Active Purchase Orders", "href" => "orders.php"],
             ["name" => "PO Approvals", "href" => "po_approvals.php"],
             ["name" => "Goods Receipt", "href" => "goods_receipt.php"],
+            ["name" => "Order History", "href" => "order_history.php"],
             ["name" => "PO QR Scanner", "href" => "po_scanner.php"],
         ]
     ],

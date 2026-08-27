@@ -13,6 +13,9 @@ $user_role = $_SESSION['role'] ?? 'Supply Chain Manager';
 
 $db_error = null;
 $flash = null;
+if (isset($_GET['created']) && $_GET['created'] !== '') {
+    $flash = "Document tracking created successfully: " . $_GET['created'];
+}
 
 // Check if document_tracking table exists
 $table_exists = false;
@@ -46,9 +49,14 @@ if ($table_exists && !$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'PO
         );
 
         if ($stmt->execute()) {
-            $flash = "Document tracking created successfully: $tracking_number";
             $log_msg = "Created document tracking: $tracking_number for " . $_POST['recipient_name'];
             $conn->query("INSERT INTO activity_log (user_id, username, action, details) VALUES (" . $_SESSION['user_id'] . ", '" . $_SESSION['username'] . "', 'Document Tracking', '$log_msg')");
+            $stmt->close();
+
+            // Redirect to a fresh GET request so refreshing the result page
+            // never resubmits this POST and creates a duplicate record.
+            header("Location: document_tracking.php?created=" . urlencode($tracking_number));
+            exit();
         } else {
             $db_error = "Failed to create tracking: " . $stmt->error;
         }
