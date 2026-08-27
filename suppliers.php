@@ -208,7 +208,7 @@ if (!$conn->connect_error) {
                                             <td class="px-6 py-4 font-bold text-slate-900">
                                                 <?php echo htmlspecialchars($sup['supplier_name']); ?>
                                                 <div class="mt-1">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-500 bg-slate-100 border border-slate-200"><?php echo htmlspecialchars($sup['vendor_type'] ?: 'Uncategorized'); ?></span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-500 bg-slate-100 border border-slate-200"><?php echo htmlspecialchars($sup['vendor_type'] ?? 'Uncategorized'); ?></span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 text-slate-700 font-medium"><?php echo htmlspecialchars($sup['contact_person'] ?: '—'); ?></td>

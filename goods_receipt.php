@@ -185,7 +185,7 @@ if (!$conn->connect_error) {
                 $order['items'][] = $row;
             }
         } else {
-            $db_error = $db_error ?? "order_items table not found — run schema_po_line_items.sql first.";
+            $db_error = $db_error ?? "order_items prepare failed: " . $conn->error;
         }
     }
     unset($order);
