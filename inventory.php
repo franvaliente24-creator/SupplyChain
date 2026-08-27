@@ -18,13 +18,16 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'add') {
-        $stmt = $conn->prepare("INSERT INTO inventory_items (sku, item_name, category, supplier_id, quantity, unit, reorder_level, unit_price, status, warehouse_zone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Generate automatic QR code
+        $qr_code = 'INV-' . strtoupper(substr($_POST['sku'], 0, 3)) . '-' . str_pad(time() % 1000000, 6, '0', STR_PAD_LEFT);
+        
+        $stmt = $conn->prepare("INSERT INTO inventory_items (sku, item_name, category, supplier_id, quantity, unit, reorder_level, unit_price, status, warehouse_zone, qr_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $supplier_id = $_POST['supplier_id'] !== '' ? (int)$_POST['supplier_id'] : null;
         $qty = (int)$_POST['quantity'];
         $reorder = (int)$_POST['reorder_level'];
         $price = (float)$_POST['unit_price'];
         
-        $stmt->bind_param("sssiisidss", 
+        $stmt->bind_param("sssiisidsss", 
             $_POST['sku'], 
             $_POST['item_name'], 
             $_POST['category'], 
@@ -34,12 +37,13 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $reorder, 
             $price, 
             $_POST['status'], 
-            $_POST['warehouse_zone']
+            $_POST['warehouse_zone'],
+            $qr_code
         );
         
         if ($stmt->execute()) {
-            $flash = "New item added successfully.";
-            $log_msg = "Added new inventory item: " . $_POST['item_name'];
+            $flash = "New item added successfully with QR code: $qr_code";
+            $log_msg = "Added new inventory item: " . $_POST['item_name'] . " (QR: $qr_code)";
             $conn->query("INSERT INTO activity_log (label, status, status_class) VALUES ('$log_msg', 'New', 'status-pill-accent')");
         } else {
             $db_error = "Failed to add item: " . $stmt->error;
@@ -175,11 +179,7 @@ function getStatusClass($status) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">ISMERS System Ecosystem</span>
-            </div>
-        </header>
+        <?php include 'header.php'; ?>
 
         <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
@@ -253,6 +253,7 @@ function getStatusClass($status) {
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4">
+                                                <div class="font-mono text-[10px] text-primary"><?php echo htmlspecialchars($item['qr_code'] ?? 'N/A'); ?></div>
                                                 <a href="qr_generator.php?item_id=<?php echo (int)$item['item_id']; ?>" target="_blank" class="text-blue-600 hover:underline text-xs">View QR</a>
                                             </td>
                                             <td class="px-6 py-4 text-right whitespace-nowrap">
@@ -400,6 +401,35 @@ function getStatusClass($status) {
         function closeModal() {
             document.getElementById('item-modal').style.display = 'none';
         }
+
+        // Real-time monitoring - Auto-refresh inventory data every 30 seconds
+        let monitoringInterval = null;
+
+        function startRealTimeMonitoring() {
+            if (monitoringInterval) return;
+            
+            monitoringInterval = setInterval(function() {
+                // Refresh the page to get updated data
+                location.reload();
+            }, 30000); // 30 seconds
+        }
+
+        function stopRealTimeMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+        }
+
+        // Start monitoring when page loads
+        window.addEventListener('load', function() {
+            startRealTimeMonitoring();
+        });
+
+        // Stop monitoring when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            stopRealTimeMonitoring();
+        });
     </script>
 </body>
 </html>

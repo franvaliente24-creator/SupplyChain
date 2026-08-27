@@ -18,10 +18,10 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'add_zone') {
-        $stmt = $conn->prepare("INSERT INTO warehouse_zones (zone_name, rack_code, capacity, current_stock, audit_status) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO warehouse_zones (zone_name, rack_code, zone_category, capacity, current_stock, audit_status) VALUES (?, ?, ?, ?, ?, ?)");
         $capacity = (int)$_POST['capacity'];
         $current_stock = (int)$_POST['current_stock'];
-        $stmt->bind_param("ssiis", $_POST['zone_name'], $_POST['rack_code'], $capacity, $current_stock, $_POST['audit_status']);
+        $stmt->bind_param("sssiis", $_POST['zone_name'], $_POST['rack_code'], $_POST['zone_category'], $capacity, $current_stock, $_POST['audit_status']);
         if ($stmt->execute()) {
             $flash = "Warehouse zone added successfully.";
         } else {
@@ -32,10 +32,10 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'edit_zone') {
         $zone_id = (int)$_POST['zone_id'];
-        $stmt = $conn->prepare("UPDATE warehouse_zones SET zone_name = ?, rack_code = ?, capacity = ?, current_stock = ?, audit_status = ? WHERE zone_id = ?");
+        $stmt = $conn->prepare("UPDATE warehouse_zones SET zone_name = ?, rack_code = ?, zone_category = ?, capacity = ?, current_stock = ?, audit_status = ? WHERE zone_id = ?");
         $capacity = (int)$_POST['capacity'];
         $current_stock = (int)$_POST['current_stock'];
-        $stmt->bind_param("ssiisi", $_POST['zone_name'], $_POST['rack_code'], $capacity, $current_stock, $_POST['audit_status'], $zone_id);
+        $stmt->bind_param("sssiisi", $_POST['zone_name'], $_POST['rack_code'], $_POST['zone_category'], $capacity, $current_stock, $_POST['audit_status'], $zone_id);
         if ($stmt->execute()) {
             $flash = "Zone parameters updated successfully.";
         } else {
@@ -138,11 +138,7 @@ function getAuditBadgeClass($status) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">Smart Warehousing Ecosystem</span>
-            </div>
-        </header>
+        <?php include 'header.php'; ?>
 
         <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
@@ -152,12 +148,15 @@ function getAuditBadgeClass($status) {
                         <p class="text-slate-500 text-sm mt-1">Configure physical racks, monitor usage capacity metrics, and log transfer movements.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="openZoneModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition shadow-sm inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Zone
+                        </button>
                         <button type="button" onclick="openMovementModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition shadow-sm inline-flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px]">swap_horiz</span> Log Movement
+                            <span class="material-symbols-outlined text-[18px]">local_shipping</span> Log Movement
                         </button>
-                        <button type="button" onclick="openZoneModal()" class="px-4 py-2 bg-primary text-on-primary rounded-lg text-xs sm:text-sm font-semibold hover:bg-primary/90 transition shadow-sm inline-flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px]">add_box</span> Create Zone
-                        </button>
+                        <a href="qr_scanner.php" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-emerald-700 transition shadow-sm inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span> QR Scanner
+                        </a>
                     </div>
                 </div>
 
@@ -272,6 +271,21 @@ function getAuditBadgeClass($status) {
                     <label>Rack Code Layout Reference</label>
                     <input type="text" name="rack_code" id="f-rack-code" placeholder="RACK-E1-E2" required/>
                 </div>
+                <div class="form-field">
+                    <label>Zone Category/Class</label>
+                    <select name="zone_category" id="f-zone-category">
+                        <option value="General Storage">General Storage</option>
+                        <option value="Warehouse Equipment">Warehouse Equipment</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Consumables">Consumables</option>
+                        <option value="Raw Materials">Raw Materials</option>
+                        <option value="Finished Goods">Finished Goods</option>
+                        <option value="Hazardous Materials">Hazardous Materials</option>
+                        <option value="Temperature Controlled">Temperature Controlled</option>
+                        <option value="High Value Items">High Value Items</option>
+                        <option value="Returns/Defective">Returns/Defective</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="form-field">
                         <label>Max Storage Capacity</label>
@@ -370,6 +384,7 @@ function getAuditBadgeClass($status) {
             document.getElementById('zone-id').value = '';
             document.getElementById('f-zone-name').value = '';
             document.getElementById('f-rack-code').value = '';
+            document.getElementById('f-zone-category').value = 'General Storage';
             document.getElementById('f-capacity').value = '500';
             document.getElementById('f-current-stock').value = '0';
             document.getElementById('f-audit-status').value = 'Verified';
@@ -382,6 +397,7 @@ function getAuditBadgeClass($status) {
             document.getElementById('zone-id').value = zone.zone_id;
             document.getElementById('f-zone-name').value = zone.zone_name;
             document.getElementById('f-rack-code').value = zone.rack_code;
+            document.getElementById('f-zone-category').value = zone.zone_category || 'General Storage';
             document.getElementById('f-capacity').value = zone.capacity;
             document.getElementById('f-current-stock').value = zone.current_stock;
             document.getElementById('f-audit-status').value = zone.audit_status;
@@ -399,6 +415,35 @@ function getAuditBadgeClass($status) {
         function closeMovementModal() {
             document.getElementById('movement-modal').style.display = 'none';
         }
+
+        // Real-time monitoring - Auto-refresh zone data every 30 seconds
+        let monitoringInterval = null;
+
+        function startRealTimeMonitoring() {
+            if (monitoringInterval) return;
+            
+            monitoringInterval = setInterval(function() {
+                // Refresh the page to get updated data
+                location.reload();
+            }, 30000); // 30 seconds
+        }
+
+        function stopRealTimeMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+        }
+
+        // Start monitoring when page loads
+        window.addEventListener('load', function() {
+            startRealTimeMonitoring();
+        });
+
+        // Stop monitoring when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            stopRealTimeMonitoring();
+        });
     </script>
 </body>
 </html>

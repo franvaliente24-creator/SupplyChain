@@ -57,6 +57,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['qr_data'])) {
         $stmt->close();
     }
 }
+
+// Handle QR code image upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['qr_image']) && $_FILES['qr_image']['error'] === UPLOAD_ERR_OK) {
+    $upload_dir = 'uploads/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    $file_ext = strtolower(pathinfo($_FILES['qr_image']['name'], PATHINFO_EXTENSION));
+    $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (in_array($file_ext, $allowed_exts)) {
+        $file_name = 'qr_' . time() . '_' . uniqid() . '.' . $file_ext;
+        $upload_path = $upload_dir . $file_name;
+        
+        if (move_uploaded_file($_FILES['qr_image']['tmp_name'], $upload_path)) {
+            // Use the uploaded file path for QR decoding (client-side will handle this)
+            $flash = "QR image uploaded successfully. Processing...";
+        } else {
+            $db_error = "Failed to upload QR image.";
+        }
+    } else {
+        $db_error = "Invalid file type. Please upload JPG, PNG, or GIF images.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html class="light" lang="en">
@@ -130,9 +155,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['qr_data'])) {
                         
                         <!-- Manual Entry Fallback -->
                         <div class="mt-6 pt-6 border-t border-slate-200">
-                            <form method="post" class="flex gap-3">
+                            <form method="post" class="flex gap-3 mb-4">
                                 <input type="text" name="qr_data" placeholder="Or enter QR code/SKU manually..." class="flex-1 px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"/>
                                 <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold">Look Up</button>
+                            </form>
+                            
+                            <!-- Upload QR Image -->
+                            <form method="post" enctype="multipart/form-data" class="flex gap-3 items-center">
+                                <label class="flex-1 flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm cursor-pointer hover:bg-slate-50 transition">
+                                    <span class="material-symbols-outlined text-slate-400">upload</span>
+                                    <span id="file-label">Upload QR image...</span>
+                                    <input type="file" name="qr_image" accept="image/*" class="hidden" onchange="document.getElementById('file-label').textContent = this.files[0]?.name || 'Upload QR image...'"/>
+                                </label>
+                                <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition">Scan Image</button>
                             </form>
                         </div>
                     </div>

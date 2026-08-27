@@ -188,6 +188,7 @@ if ($table_exists && !$conn->connect_error) {
         }
     }
 } else {
+    $asset_types = [];
     if (!$table_exists) {
         $db_error = "Tech assets table not found. Please run the schema_updates.sql file to create it.";
     } else {
@@ -408,15 +409,62 @@ function getStatusBadgeClass($status) {
                     <div class="form-field">
                         <label>Asset Type</label>
                         <select name="asset_type" id="f-asset-type" required>
-                            <option value="Laptop">Laptop</option>
-                            <option value="Headset">Headset</option>
-                            <option value="Webcam">Webcam</option>
-                            <option value="Monitor">Monitor</option>
-                            <option value="Keyboard">Keyboard</option>
-                            <option value="Mouse">Mouse</option>
-                            <option value="Docking Station">Docking Station</option>
-                            <option value="Tablet">Tablet</option>
-                            <option value="Other">Other</option>
+                            <optgroup label="Computing Devices">
+                                <option value="Laptop">Laptop</option>
+                                <option value="Desktop Computer">Desktop Computer</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Server">Server</option>
+                                <option value="Workstation">Workstation</option>
+                            </optgroup>
+                            <optgroup label="Peripherals">
+                                <option value="Monitor">Monitor</option>
+                                <option value="Keyboard">Keyboard</option>
+                                <option value="Mouse">Mouse</option>
+                                <option value="Headset">Headset</option>
+                                <option value="Webcam">Webcam</option>
+                                <option value="Docking Station">Docking Station</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Scanner">Scanner</option>
+                            </optgroup>
+                            <optgroup label="Network Equipment">
+                                <option value="Router">Router</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Access Point">Access Point</option>
+                                <option value="Firewall">Firewall</option>
+                                <option value="Modem">Modem</option>
+                            </optgroup>
+                            <optgroup label="Storage Devices">
+                                <option value="External Hard Drive">External Hard Drive</option>
+                                <option value="NAS">NAS (Network Attached Storage)</option>
+                                <option value="USB Drive">USB Drive</option>
+                                <option value="SD Card">SD Card</option>
+                            </optgroup>
+                            <optgroup label="Audio/Visual Equipment">
+                                <option value="Projector">Projector</option>
+                                <option value="Speaker System">Speaker System</option>
+                                <option value="Microphone">Microphone</option>
+                                <option value="Camera">Camera</option>
+                            </optgroup>
+                            <optgroup label="Mobile Devices">
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Mobile Hotspot">Mobile Hotspot</option>
+                                <option value="Smartwatch">Smartwatch</option>
+                            </optgroup>
+                            <optgroup label="Power & Cables">
+                                <option value="Power Strip">Power Strip</option>
+                                <option value="UPS">UPS (Uninterruptible Power Supply)</option>
+                                <option value="Cable Management">Cable Management</option>
+                                <option value="Extension Cord">Extension Cord</option>
+                            </optgroup>
+                            <optgroup label="Furniture & Accessories">
+                                <option value="Monitor Stand">Monitor Stand</option>
+                                <option value="Laptop Stand">Laptop Stand</option>
+                                <option value="Desk Organizer">Desk Organizer</option>
+                                <option value="Ergonomic Chair">Ergonomic Chair</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option value="Other">Other</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div class="form-field">

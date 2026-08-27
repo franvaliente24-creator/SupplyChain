@@ -137,11 +137,7 @@ if (!$conn->connect_error) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">Inventory Management System</span>
-            </div>
-        </header>
+        <?php include 'header.php'; ?>
 
         <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
@@ -153,9 +149,6 @@ if (!$conn->connect_error) {
                     <div class="flex gap-2">
                         <a href="inventory.php" class="px-4 py-2 bg-primary text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-primary/90 transition shadow-sm inline-flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-[18px]">inventory_2</span> Manage Inventory
-                        </a>
-                        <a href="qr_scanner.php" class="px-4 py-2 border border-slate-200 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-50 inline-flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span> QR Scanner
                         </a>
                     </div>
                 </div>

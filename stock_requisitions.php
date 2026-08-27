@@ -196,11 +196,7 @@ function getStatusBadgeClass($status) {
     <?php include 'sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="font-bold text-slate-800 text-sm">Inventory Management System</span>
-            </div>
-        </header>
+        <?php include 'header.php'; ?>
 
         <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
@@ -320,7 +316,24 @@ function getStatusBadgeClass($status) {
 
                 <div class="form-field">
                     <label>Department</label>
-                    <input type="text" name="department" placeholder="IT Department" required/>
+                    <select name="department" required>
+                        <option value="">Select Department...</option>
+                        <option value="IT Department">IT Department</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Customer Service">Customer Service</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Warehouse">Warehouse</option>
+                        <option value="Procurement">Procurement</option>
+                        <option value="Quality Control">Quality Control</option>
+                        <option value="Research & Development">Research & Development</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Administration">Administration</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
 
                 <div class="form-field">
@@ -392,6 +405,12 @@ function getStatusBadgeClass($status) {
 
     <script>
         function openCreateModal() {
+            document.getElementById('create-modal-title').textContent = 'Create Stock Requisition';
+            document.getElementById('create-action').value = 'create_requisition';
+            document.getElementById('f-department').value = '';
+            document.getElementById('f-item-id').value = '';
+            document.getElementById('f-quantity').value = '1';
+            document.getElementById('f-justification').value = '';
             document.getElementById('create-modal').style.display = 'flex';
         }
 
@@ -401,16 +420,41 @@ function getStatusBadgeClass($status) {
 
         function openApproveModal(req) {
             document.getElementById('approve-req-id').value = req.requisition_id;
-            document.getElementById('approve-req-number').textContent = req.requisition_number;
-            document.getElementById('approve-department').textContent = req.department;
-            document.getElementById('approve-quantity').textContent = req.quantity_requested;
-            document.getElementById('approve-qty').value = req.quantity_requested;
             document.getElementById('approve-modal').style.display = 'flex';
         }
 
         function closeApproveModal() {
             document.getElementById('approve-modal').style.display = 'none';
         }
+
+        // Real-time monitoring - Auto-refresh requisitions data every 30 seconds
+        let monitoringInterval = null;
+
+        function startRealTimeMonitoring() {
+            if (monitoringInterval) return;
+            
+            monitoringInterval = setInterval(function() {
+                // Refresh the page to get updated data
+                location.reload();
+            }, 30000); // 30 seconds
+        }
+
+        function stopRealTimeMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+        }
+
+        // Start monitoring when page loads
+        window.addEventListener('load', function() {
+            startRealTimeMonitoring();
+        });
+
+        // Stop monitoring when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            stopRealTimeMonitoring();
+        });
     </script>
 </body>
 </html>

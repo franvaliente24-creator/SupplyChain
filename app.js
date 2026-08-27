@@ -380,7 +380,7 @@ function initSidebarController() {
         } else {
             isDesktopOpen = !isDesktopOpen;
             if (isDesktopOpen) {
-                sidebar.classList.remove('w-0', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-0');
+                sidebar.classList.remove('w-20', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-20');
                 sidebar.classList.add('w-72', 'border-r', 'opacity-100');
                 if (desktopToggle) {
                     desktopToggle.setAttribute('title', 'Close Sidebar');
@@ -388,7 +388,7 @@ function initSidebarController() {
                 }
             } else {
                 sidebar.classList.remove('w-72', 'border-r', 'opacity-100');
-                sidebar.classList.add('w-0', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-0');
+                sidebar.classList.add('w-20', 'border-r', 'opacity-100', 'pointer-events-auto');
                 if (desktopToggle) {
                     desktopToggle.setAttribute('title', 'Open Sidebar');
                     desktopToggle.setAttribute('aria-expanded', 'false');
@@ -420,15 +420,15 @@ function initSidebarController() {
                 backdrop.setAttribute('aria-hidden', 'true');
             }
             if (isDesktopOpen) {
-                sidebar.classList.remove('w-0', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-0');
+                sidebar.classList.remove('w-20', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-20');
                 sidebar.classList.add('w-72', 'border-r', 'opacity-100');
             } else {
                 sidebar.classList.remove('w-72', 'border-r', 'opacity-100');
-                sidebar.classList.add('w-0', 'border-r-0', 'opacity-0', 'pointer-events-none', 'md:opacity-0', 'md:border-r-0', 'md:w-0');
+                sidebar.classList.add('w-20', 'border-r', 'opacity-100', 'pointer-events-auto');
             }
         } else if (!isMobileOpen) {
             sidebar.classList.add('-translate-x-full');
-            sidebar.classList.remove('translate-x-0', 'w-0', 'border-r-0', 'opacity-0', 'pointer-events-none');
+            sidebar.classList.remove('translate-x-0', 'w-20', 'border-r-0', 'opacity-0', 'pointer-events-none');
             sidebar.classList.add('w-72', 'border-r', 'opacity-100');
         }
         updateIcon();
