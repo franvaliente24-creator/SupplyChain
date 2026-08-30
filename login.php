@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require 'db_connection.php'; // Include your database connection
+require 'core_connection.php'; // Include your database connection
 
 // Get the JSON data from the request
 $data = json_decode(file_get_contents('php://input'), true);
@@ -62,11 +62,11 @@ if (!password_verify($password, $hashedPassword)) {
     // Log failed login attempt to activity log (best-effort, never fatal)
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $failedAction = 'Failed Login';
+    $failedDetails = 'Invalid password attempt';
     $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
     if ($log_stmt) {
-        $log_stmt->bind_param("issss", $userId, $username, $failedAction, $failedDetails, $ip_address, $user_agent);
-        $failedAction = 'Failed Login';
-        $failedDetails = 'Invalid password attempt';
+        $log_stmt->bind_param("isssss", $userId, $username, $failedAction, $failedDetails, $ip_address, $user_agent);
         $log_stmt->execute();
         $log_stmt->close();
     }
@@ -123,8 +123,6 @@ if ($login_history_check && $login_history_check->num_rows > 0) {
 if ($login_history_check) $login_history_check->free();
 
 // Update last_login in users table — only if the column actually exists.
-// (schema_updates.sql leaves this as a commented-out manual ALTER TABLE,
-// so on a fresh install this column may not exist yet.)
 $hasLastLogin = false;
 $colCheck = $conn->query("SHOW COLUMNS FROM users LIKE 'last_login'");
 if ($colCheck && $colCheck->num_rows > 0) {
