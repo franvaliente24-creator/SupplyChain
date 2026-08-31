@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'dtrs_connection.php';
 
 $section_title = "Document Tracking System";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
