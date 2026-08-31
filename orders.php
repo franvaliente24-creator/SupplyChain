@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'pom_connection.php';
 
 $section_title = "Purchase Order Management";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
