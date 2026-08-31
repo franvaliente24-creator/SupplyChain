@@ -439,3 +439,164 @@ function getModuleHref(subsystemId, moduleId) {
 function getDashboardHref(subsystemId) {
     return `dashboard.html?subsystem=${encodeURIComponent(subsystemId || 'supply-chain')}`;
 }
+
+/**
+ * subsystems.js — Central Subsystem & Navigation Definition Registry
+ */
+
+const subsystems = [
+  {
+    id: 'supply-chain',
+    title: 'Supply Chain & Inventory Management System',
+    category: 'Logistics & Supply Operations',
+    description: 'Centralized warehouse, inventory control, procurement, supplier registry, and logistics dispatch.',
+    stats: [
+      { label: 'Active SKUs', value: '1,420', icon: 'inventory_2', tone: 'positive', trend: [65, 70, 75, 80, 85, 90, 95] },
+      { label: 'Pending Requisitions', value: '18', icon: 'assignment', tone: 'caution', trend: [30, 28, 25, 22, 20, 19, 18] },
+      { label: 'Storage Occupancy', value: '78%', icon: 'warehouse', tone: 'positive', trend: [60, 64, 68, 70, 72, 75, 78] },
+      { label: 'Active Shipments', value: '24', icon: 'local_shipping', tone: 'neutral', trend: [15, 18, 20, 22, 21, 23, 24] }
+    ],
+    quickActions: [
+      'Approve purchase orders',
+      'Update inventory counts',
+      'Track outstanding shipments',
+      'Review supplier ratings'
+    ],
+    activity: [
+      { label: 'Zone A visual audit completed', status: 'Completed', time: '10 mins ago', category: 'Inventory' },
+      { label: 'PO-2026-089 approved for dispatch', status: 'Updated', time: '45 mins ago', category: 'Shipments' },
+      { label: 'New requisition REQ-2026-015 filed', status: 'Pending', time: '2 hours ago', category: 'Vendors' }
+    ],
+    analytics: {
+      overviewTitle: 'Logistics & Stock Performance',
+      overviewMetric: '94.2% In-Stock Rate',
+      overviewSubtitle: 'Aggregate operational throughput across all warehouse zones and active dispatch routes.',
+      overviewTrend: 'Last 30 Days',
+      overviewData: [
+        { label: 'Zone A', value: 85 },
+        { label: 'Zone B', value: 65 },
+        { label: 'Zone C', value: 40 },
+        { label: 'Zone D', value: 90 }
+      ],
+      overviewHighlights: [
+        { label: 'Fulfilled Requisitions', value: '96.8%' },
+        { label: 'Inventory Turnover', value: '4.2x' }
+      ],
+      breakdownTitle: 'Warehouse Space Utilization',
+      breakdownTotal: '4,000 Units',
+      breakdownSegments: [
+        { label: 'Zone A (Bulk)', value: '35%', color: '#4f46e5' },
+        { label: 'Zone B (Racks)', value: '28%', color: '#06b6d4' },
+        { label: 'Zone C (Bins)', value: '22%', color: '#f59e0b' },
+        { label: 'Zone D (Staging)', value: '15%', color: '#10b981' }
+      ]
+    },
+    criticalAlerts: [
+      {
+        severity: 'high',
+        type: 'low-stock',
+        title: 'Critical Stock Threshold',
+        message: 'Items operating below configured safety stock levels.',
+        items: ['SYS-1077 (Heavy Duty Packing Tape 50m)', 'SYS-1042 (Wireless Barcode Scanner Unit)']
+      }
+    ],
+    modules: [
+      // 1. Smart Warehousing System (SWS)
+      {
+        id: 'smart-warehousing-system',
+        name: 'Smart Warehousing System (SWS)',
+        subnav: [
+          { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', href: 'zone_map.php' },
+          { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', href: 'bin_lookup.php' },
+          { id: 'task-queues', label: 'Task Queues', icon: 'assignment', href: 'task_queues.php' },
+          { id: 'cycle-count', label: 'Cycle Count', icon: 'checklist', href: 'cycle_count.php' }
+        ]
+      },
+
+      // 2. Inventory Management System (IMS)
+      {
+        id: 'inventory-management-system',
+        name: 'Inventory Management System (IMS)',
+        subnav: [
+          { id: 'item-master', label: 'Item Master', icon: 'inventory_2', href: 'item_master.php' },
+          { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', href: 'stock_levels.php' },
+          { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', href: 'utilization_overview.php' },
+          { id: 'adjustments', label: 'Adjustments', icon: 'tune', href: 'adjustments.php' },
+          { id: 'asset-disposition', label: 'Asset Disposition', icon: 'swap_horiz', href: 'asset_disposition.php' }
+        ]
+      },
+
+      // 3. Procurement & Sourcing Management (PSM)
+      {
+        id: 'procurement-sourcing-management',
+        name: 'Procurement & Sourcing Management (PSM)',
+        subnav: [
+          { id: 'requisitions', label: 'Requisitions', icon: 'description', href: 'requisitions.php' },
+          { id: 'rfqs', label: 'RFQs', icon: 'request_quote', href: 'rfqs.php' },
+          { id: 'sourcing', label: 'Sourcing', icon: 'handshake', href: 'sourcing.php' },
+          { id: 'spend', label: 'Spend', icon: 'payments', href: 'spend.php' }
+        ]
+      },
+
+      // 4. Supplier / Vendor Management (SVM)
+      {
+        id: 'supplier-vendor-management',
+        name: 'Supplier / Vendor Management (SVM)',
+        subnav: [
+          { id: 'carriers', label: 'Carrier Directory', icon: 'local_shipping', href: 'carriers.php' }
+        ]
+      },
+
+      // 5. Purchase Order Management (POM)
+      {
+        id: 'purchase-order-management',
+        name: 'Purchase Order Management (POM)',
+        subnav: [
+          { id: 'goods-receipt', label: 'Goods Receipt', icon: 'fact_check', href: 'goods_receipt.php' }
+        ]
+      },
+
+      // 6. Document Tracking & Logistics Records System (DTRS)
+      {
+        id: 'document-tracking-logistics-records',
+        name: 'Document Tracking & Logistics Records System (DTRS)',
+        subnav: [
+          { id: 'manifests', label: 'Shipping Manifests', icon: 'local_shipping', href: 'dtrs.php' },
+          { id: 'documents', label: 'Document Repository', icon: 'folder', href: 'document_repository.php' },
+          { id: 'customs', label: 'Customs & Compliance', icon: 'gavel', href: 'customs_records.php' },
+          { id: 'tracking', label: 'Document Tracking', icon: 'timeline', href: 'document_tracking.php' }
+        ]
+      }
+    ]
+  }
+];
+
+// Helper functions for dashboard & sidebar router
+function getSubsystemFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('subsystem') || 'supply-chain';
+}
+
+function getModuleFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('module');
+}
+
+function getSubsystemById(id) {
+  return subsystems.find(s => s.id === id) || subsystems[0];
+}
+
+function normalizeModule(module) {
+  if (typeof module === 'string') {
+    return { id: module.toLowerCase().replace(/[^a-z0-9]+/g, '-'), name: module, subnav: [] };
+  }
+  return module;
+}
+
+function getDashboardHref(subsystemId) {
+  return `dashboard.html?subsystem=${encodeURIComponent(subsystemId)}`;
+}
+
+function getModuleHref(subsystemId, moduleId) {
+  return `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
+}
