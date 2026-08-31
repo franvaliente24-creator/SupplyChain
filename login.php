@@ -105,7 +105,7 @@ $log_stmt = $conn->prepare("INSERT INTO activity_log (user_id, username, action,
 if ($log_stmt) {
     $successAction = 'Successful Login';
     $successDetails = 'User logged in successfully';
-    $log_stmt->bind_param("issss", $userId, $username, $successAction, $successDetails, $ip_address, $user_agent);
+    $log_stmt->bind_param("isssss", $userId, $username, $successAction, $successDetails, $ip_address, $user_agent);
     $log_stmt->execute();
     $log_stmt->close();
 }
