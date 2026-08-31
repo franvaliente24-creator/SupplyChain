@@ -80,6 +80,7 @@ const subsystemsData = {
           { id: 'performance-scorecard', label: 'Performance Scorecard', icon: 'star', href: 'supplier_performance.php' },
           { id: 'contracts-compliance', label: 'Contracts & Compliance', icon: 'verified', href: 'supplier_contracts.php' },
           { id: 'supplier-documents', label: 'Supplier Documents', icon: 'folder', href: 'supplier_documents.php' },
+          { id: 'supplier-transactions', label: 'Supplier Transactions', icon: 'receipt', href: 'supplier_transactions.php' },
           { id: 'supplier-reports', label: 'Supplier Reports', icon: 'insights', href: 'supplier_reports.php' }
         ]
       },

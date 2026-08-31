@@ -1,5 +1,5 @@
 <?php
-// sidebar.php - Synchronized Supply Chain Sidebar Navigation
+// sidebar.php - Synchronized Navigation Component
 $current_page = basename($_SERVER['PHP_SELF']);
 
 $nav_groups = [
@@ -46,6 +46,7 @@ $nav_groups = [
             ["name" => "Performance Scorecard", "icon" => "star", "href" => "supplier_performance.php"],
             ["name" => "Contracts & Compliance", "icon" => "verified", "href" => "supplier_contracts.php"],
             ["name" => "Supplier Documents", "icon" => "folder", "href" => "supplier_documents.php"],
+            ["name" => "Supplier Transactions", "icon" => "receipt", "href" => "supplier_transactions.php"],
             ["name" => "Supplier Reports", "icon" => "insights", "href" => "supplier_reports.php"],
         ]
     ],
@@ -80,7 +81,7 @@ $nav_groups = [
 <!-- Mobile Overlay Backdrop -->
 <div id="sidebar-backdrop" class="fixed top-16 bottom-0 left-0 right-0 md:inset-0 bg-gray-900/50 backdrop-blur-md z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
 
-<!-- Sidebar Container -->
+<!-- Left Sidebar -->
 <aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 relative overflow-visible h-screen">
     <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-40"></div>
     
@@ -104,7 +105,7 @@ $nav_groups = [
             <span>Dashboard</span>
         </a>
 
-        <!-- Module Accordions -->
+        <!-- Module Accordion Groups -->
         <div class="sidebar-subsystem-modules space-y-1 pt-2">
             <?php foreach ($nav_groups as $group): 
                 $child_hrefs = array_column($group['children'], 'href');
