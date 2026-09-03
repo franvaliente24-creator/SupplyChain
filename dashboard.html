@@ -404,7 +404,7 @@ Cancel
     }
     
     async function performLogout() {
-        const BASE = window.APP_BASE_URL || '/SupplyChain';
+        const BASE = window.APP_BASE_URL || '';
         closeDashboardModal('dash-logout-modal');
         try {
             await fetch(`${BASE}/logout.php`, {
@@ -521,7 +521,7 @@ Cancel
     }
 
     (async function ensureAuthenticated() {
-        const BASE = window.APP_BASE_URL || '/SupplyChain';
+        const BASE = window.APP_BASE_URL || '';
         try {
             const resp = await fetch(`${BASE}/check_session.php`, {
                 method: 'GET',

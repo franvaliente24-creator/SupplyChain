@@ -23,7 +23,7 @@
 
 return [
     'core' => [
-        'base_url' => getenv('CORE_API_BASE') ?: 'http://localhost/SupplyChain/core-api',
+        'base_url' => getenv('CORE_API_BASE') ?: 'https://scim.greatsolomonmpservices.com/core-api',
         'api_key'  => getenv('CORE_API_KEY')  ?: '148039723e92fbc8691dbfd0d8c4bb21daaa0c4724be47911452bbd622cb747c',
     ],
 

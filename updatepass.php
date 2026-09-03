@@ -57,8 +57,8 @@ if ($updStmt->execute()) {
     if ($tableCheck) $tableCheck->free();
     if ($delStmt2) $delStmt2->close();
 
-    setcookie('remember_token', '', time() - 3600, '/SupplyChain');
-    setcookie('remember_uid', '', time() - 3600, '/SupplyChain');
+    setcookie('remember_token', '', time() - 3600, '/');
+    setcookie('remember_uid', '', time() - 3600, '/');
     setcookie('remember_token', '', time() - 3600, '/');
     setcookie('remember_uid', '', time() - 3600, '/');
 

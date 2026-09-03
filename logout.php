@@ -34,8 +34,8 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
-setcookie('remember_token', '', time() - 3600, '/SupplyChain');
-setcookie('remember_uid', '', time() - 3600, '/SupplyChain');
+setcookie('remember_token', '', time() - 3600, '/');
+setcookie('remember_uid', '', time() - 3600, '/');
 setcookie('remember_token', '', time() - 3600, '/');
 setcookie('remember_uid', '', time() - 3600, '/');
 
