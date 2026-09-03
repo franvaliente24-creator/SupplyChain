@@ -1881,9 +1881,11 @@ button, label[for^="filter-"] {
 .sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
 .sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined,
 .sidebar.w-20 .sidebar-main-link .material-symbols-outlined,
+.sidebar.w-20 .material-symbols-outlined,
 .dashboard-sidebar.w-20 .sidebar-module-toggle .material-symbols-outlined,
 .dashboard-sidebar.w-20 .sidebar-subsystem-link .material-symbols-outlined,
-.dashboard-sidebar.w-20 .sidebar-main-link .material-symbols-outlined {
+.dashboard-sidebar.w-20 .sidebar-main-link .material-symbols-outlined,
+.dashboard-sidebar.w-20 .material-symbols-outlined {
   display: inline-flex !important;
   font-size: 1.25rem;
 }
