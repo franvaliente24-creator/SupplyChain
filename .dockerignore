@@ -1,0 +1,4 @@
+db sql/
+.git
+.gitignore
+*.tmp
