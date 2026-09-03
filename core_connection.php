@@ -1,13 +1,12 @@
 <?php
-// core_connection.php — connection to the Identity/Audit service database.
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username   = getenv('DB_USERNAME') ?: 'root';
-$password   = getenv('DB_PASSWORD') ?: '';
-$dbname     = getenv('DB_CORE_DATABASE') ?: 'db_core';   // ← note: different var name, see below
+$servername = getenv('DB_CORE_HOST') ?: 'localhost';
+$username   = getenv('DB_CORE_USERNAME') ?: 'root';
+$password   = getenv('DB_CORE_PASSWORD') ?: '';
+$dbname     = getenv('DB_CORE_DATABASE') ?: 'db_core';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
