@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 0);
 error_reporting(0);
 
 header('Content-Type: application/json');
-require 'db_connection.php';
+require 'core_connection.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 $token = $data['token'] ?? '';

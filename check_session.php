@@ -17,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require 'db_connection.php';
+require 'core_connection.php';
 
 $loggedIn = false;
 $userId = null;

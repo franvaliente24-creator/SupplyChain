@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'sws_connection.php';
 
 $section_title = "Equipment-to-Candidate Matching";
 $admin_user = $_SESSION['username'] ?? 'Admin User';

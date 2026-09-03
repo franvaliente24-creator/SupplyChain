@@ -39,7 +39,7 @@ setcookie('remember_uid', '', time() - 3600, '/SupplyChain');
 setcookie('remember_token', '', time() - 3600, '/');
 setcookie('remember_uid', '', time() - 3600, '/');
 
-require 'db_connection.php';
+require 'core_connection.php';
 if (!empty($_COOKIE['remember_uid'])) {
     $rememberUid = (int)$_COOKIE['remember_uid'];
     $tableCheck = $conn->query("SHOW TABLES LIKE 'remember_tokens'");

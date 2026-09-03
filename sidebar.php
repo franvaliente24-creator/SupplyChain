@@ -1,40 +1,40 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// sidebar.php - Synchronized Navigation Component
 $current_page = basename($_SERVER['PHP_SELF']);
-$admin_user = $_SESSION['username'] ?? ($admin_user ?? 'Admin User');
-$user_role = $_SESSION['role'] ?? ($user_role ?? 'Supply Chain Manager');
 
-$sub_modules = [
+$nav_groups = [
     [
         "name" => "Smart Warehousing System (SWS)",
         "icon" => "warehouse",
-        "href" => "warehouse.php",
+        "href" => "zone_map.php",
         "children" => [
-            ["name" => "Tech Assets", "href" => "tech_assets.php"],
-            ["name" => "Equipment Matching", "href" => "asset_assignments.php"],
+            ["name" => "Zone Map", "icon" => "grid_view", "href" => "zone_map.php"],
+            ["name" => "Bin Lookup", "icon" => "search", "href" => "bin_lookup.php"],
+            ["name" => "Task Queues", "icon" => "assignment", "href" => "task_queues.php"],
+            ["name" => "Cycle Count", "icon" => "checklist", "href" => "cycle_count.php"],
         ]
     ],
     [
         "name" => "Inventory Management System (IMS)",
         "icon" => "inventory_2",
-        "href" => "inventory.php",
+        "href" => "item_master.php",
         "children" => [
-            ["name" => "Inventory Items", "href" => "inventory.php"],
-            ["name" => "Inventory Analytics", "href" => "inventory_dashboard.php"],
-            ["name" => "QR Scanner", "href" => "qr_scanner.php"],
-            ["name" => "Stock Requisitions", "href" => "stock_requisitions.php"],
+            ["name" => "Item Master", "icon" => "inventory_2", "href" => "item_master.php"],
+            ["name" => "Stock Levels", "icon" => "bar_chart", "href" => "stock_levels.php"],
+            ["name" => "Utilization Overview", "icon" => "pie_chart", "href" => "utilization_overview.php"],
+            ["name" => "Adjustments", "icon" => "tune", "href" => "adjustments.php"],
+            ["name" => "Asset Disposition", "icon" => "swap_horiz", "href" => "asset_disposition.php"],
         ]
     ],
     [
         "name" => "Procurement & Sourcing Management (PSM)",
         "icon" => "shopping_bag",
-        "href" => "psm.php",
+        "href" => "requisitions.php",
         "children" => [
-            ["name" => "RFP Management", "href" => "rfp_management.php"],
-            ["name" => "Procurement Templates", "href" => "procurement_templates.php"],
+            ["name" => "Requisitions", "icon" => "description", "href" => "requisitions.php"],
+            ["name" => "RFQs", "icon" => "request_quote", "href" => "rfqs.php"],
+            ["name" => "Sourcing", "icon" => "handshake", "href" => "sourcing.php"],
+            ["name" => "Spend Analysis", "icon" => "payments", "href" => "spend.php"],
         ]
     ],
     [
@@ -42,11 +42,12 @@ $sub_modules = [
         "icon" => "handshake",
         "href" => "suppliers.php",
         "children" => [
-            ["name" => "Vendor Directory", "href" => "suppliers.php"],
-            ["name" => "Performance Scorecard", "href" => "supplier_performance.php"],
-            ["name" => "Contracts & Compliance", "href" => "supplier_contracts.php"],
-            ["name" => "Supplier Documents", "href" => "supplier_documents.php"],
-            ["name" => "Supplier Reports", "href" => "supplier_reports.php"],
+            ["name" => "Vendor Directory", "icon" => "contacts", "href" => "suppliers.php"],
+            ["name" => "Performance Scorecard", "icon" => "star", "href" => "supplier_performance.php"],
+            ["name" => "Contracts & Compliance", "icon" => "verified", "href" => "supplier_contracts.php"],
+            ["name" => "Supplier Documents", "icon" => "folder", "href" => "supplier_documents.php"],
+            ["name" => "Supplier Transactions", "icon" => "receipt", "href" => "supplier_transactions.php"],
+            ["name" => "Supplier Reports", "icon" => "insights", "href" => "supplier_reports.php"],
         ]
     ],
     [
@@ -54,85 +55,104 @@ $sub_modules = [
         "icon" => "receipt_long",
         "href" => "orders.php",
         "children" => [
-            ["name" => "Active Purchase Orders", "href" => "orders.php"],
-            ["name" => "PO Approvals", "href" => "po_approvals.php"],
-            ["name" => "Goods Receipt", "href" => "goods_receipt.php"],
-            ["name" => "PO QR Scanner", "href" => "po_scanner.php"],
+            ["name" => "Active Purchase Orders", "icon" => "receipt_long", "href" => "orders.php"],
+            ["name" => "PO Approvals", "icon" => "task_alt", "href" => "po_approvals.php"],
+            ["name" => "Goods Receipt", "icon" => "inventory", "href" => "goods_receipt.php"],
+            ["name" => "Order History", "icon" => "history", "href" => "order_history.php"],
+            ["name" => "PO QR Scanner", "icon" => "qr_code_scanner", "href" => "po_scanner.php"],
         ]
     ],
     [
-        "name" => "Document Tracking & Logistics Records System (DTRS)",
+        "name" => "Document Tracking & Logistics Records (DTRS)",
         "icon" => "local_shipping",
         "href" => "dtrs.php",
         "children" => [
-            ["name" => "Shipment Manifests & Tracking", "href" => "dtrs.php"],
-            ["name" => "Delivery Confirmation (POD)", "href" => "pod.php"],
-            ["name" => "Document Repository", "href" => "document_repository.php"],
-            ["name" => "Track Documents", "href" => "document_tracking.php"],
-            ["name" => "Carrier / 3PL Directory", "href" => "carriers.php"],
-            ["name" => "Customs & Compliance Records", "href" => "customs_records.php"],
+            ["name" => "Shipment Manifests & Tracking", "icon" => "local_shipping", "href" => "dtrs.php"],
+            ["name" => "Delivery Confirmation (POD)", "icon" => "assignment_turned_in", "href" => "pod.php"],
+            ["name" => "Document Repository", "icon" => "folder_open", "href" => "document_repository.php"],
+            ["name" => "Track Documents", "icon" => "markunread_mailbox", "href" => "document_tracking.php"],
+            ["name" => "Carrier / 3PL Directory", "icon" => "commute", "href" => "carriers.php"],
+            ["name" => "Customs & Compliance Records", "icon" => "gavel", "href" => "customs_records.php"],
         ]
     ]
 ];
-
-// A module is "open" if the current page is its own href or one of its children's hrefs
-function sidebar_module_is_active($mod, $current_page) {
-    if ($mod['href'] === $current_page) return true;
-    if (!empty($mod['children'])) {
-        foreach ($mod['children'] as $child) {
-            if ($child['href'] === $current_page) return true;
-        }
-    }
-    return false;
-}
 ?>
+
+<!-- Mobile Overlay Backdrop -->
 <div id="sidebar-backdrop" class="fixed top-16 bottom-0 left-0 right-0 md:inset-0 bg-gray-900/50 backdrop-blur-md z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
-<aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-outline-variant/30 flex flex-col shrink-0 transition-all duration-300 relative overflow-visible">
+
+<!-- Left Sidebar -->
+<aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 relative overflow-visible h-screen">
     <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-40"></div>
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
         <div class="sidebar-brand-section">
             <div class="sidebar-brand-card">
-                <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                    <img src="img/logo.png" alt="Supply Chain Logo" class="w-full h-full object-cover"/>
+                <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary text-xl">local_shipping</span>
                 </div>
-                <div class="sidebar-brand-title">Supply Chain</div>
-                <div class="sidebar-brand-subtitle">Supply Chain &amp; Inventory</div>
             </div>
         </div>
-        <a class="sidebar-main-link" href="dashboard.html?subsystem=supply-chain">
-            <span class="sidebar-main-link-icon material-symbols-outlined">dashboard</span>
-            <span class="font-label font-medium text-sm">Dashboard</span>
+
+        <!-- Dashboard Link -->
+        <a id="sidebar-dashboard-link" class="sidebar-main-link flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-medium text-xs transition <?php echo ($current_page === 'dashboard.html' || $current_page === 'dashboard.php') ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''; ?>" href="dashboard.html?subsystem=supply-chain">
+            <span class="material-symbols-outlined text-indigo-600 text-[18px]">dashboard</span>
+            <span>Dashboard</span>
         </a>
-        <div class="sidebar-subsystem-nav-panel">
-            <nav class="sidebar-subsystem-modules">
-                <?php foreach ($sub_modules as $mod):
-                    $hasChildren = !empty($mod['children']);
-                    $isOpen = $hasChildren && sidebar_module_is_active($mod, $current_page);
-                ?>
-                    <div class="sidebar-module-group<?php echo $isOpen ? ' open' : ''; ?>">
-                        <div class="sidebar-module-row">
-                            <a href="<?php echo $mod['href']; ?>" class="sidebar-subsystem-link<?php echo ($mod['href'] === $current_page) ? ' active' : ''; ?>">
-                                <span class="material-symbols-outlined sidebar-subsystem-link-icon"><?php echo $mod['icon']; ?></span>
-                                <span class="truncate text-xs"><?php echo $mod['name']; ?></span>
+
+        <!-- Module Accordion Groups -->
+        <div class="sidebar-subsystem-modules space-y-1 pt-2">
+            <?php foreach ($nav_groups as $group): 
+                $child_hrefs = array_column($group['children'], 'href');
+                $is_open = in_array($current_page, $child_hrefs, true) || ($current_page === $group['href']);
+            ?>
+                <div class="sidebar-module-group <?php echo $is_open ? 'open' : ''; ?>">
+                    <button type="button" class="sidebar-module-toggle w-full flex items-center justify-between px-3 py-2 rounded-xl border border-transparent text-slate-700 hover:bg-slate-100 font-medium text-xs transition <?php echo $is_open ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''; ?>">
+                        <span class="flex items-center gap-2.5 truncate">
+                            <span class="material-symbols-outlined text-[18px] text-indigo-600"><?php echo htmlspecialchars($group['icon']); ?></span>
+                            <span class="truncate"><?php echo htmlspecialchars($group['name']); ?></span>
+                        </span>
+                        <span class="material-symbols-outlined sidebar-chevron text-[16px] text-slate-400 transition-transform duration-200 <?php echo $is_open ? 'rotate-180' : ''; ?>">expand_more</span>
+                    </button>
+
+                    <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="<?php echo $is_open ? 'max-height: 500px; display: block;' : 'max-height: 0px; display: none;'; ?>">
+                        <?php foreach ($group['children'] as $child): 
+                            $is_active = ($current_page === $child['href']);
+                        ?>
+                            <a href="<?php echo htmlspecialchars($child['href']); ?>" 
+                               class="sidebar-submenu-link flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition <?php echo $is_active ? 'bg-indigo-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'; ?>">
+                                <span class="material-symbols-outlined sidebar-submenu-icon text-[16px] <?php echo $is_active ? 'text-white' : 'text-slate-400'; ?>"><?php echo htmlspecialchars($child['icon']); ?></span>
+                                <span class="truncate"><?php echo htmlspecialchars($child['name']); ?></span>
                             </a>
-                            <?php if ($hasChildren): ?>
-                                <button type="button" class="sidebar-submenu-toggle" aria-label="Toggle submodules" aria-expanded="<?php echo $isOpen ? 'true' : 'false'; ?>">
-                                    <span class="material-symbols-outlined sidebar-submenu-chevron">expand_more</span>
-                                </button>
-                            <?php endif; ?>
-                        </div>
-                        <?php if ($hasChildren): ?>
-                            <div class="sidebar-submenu">
-                                <?php foreach ($mod['children'] as $child): ?>
-                                    <a href="<?php echo $child['href']; ?>" class="sidebar-submenu-link<?php echo ($child['href'] === $current_page) ? ' active' : ''; ?>">
-                                        <span class="truncate text-xs"><?php echo $child['name']; ?></span>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
-            </nav>
+                </div>
+            <?php endforeach; ?>
         </div>
     </nav>
 </aside>
+
+<script>
+document.querySelectorAll('.sidebar-module-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const parentGroup = btn.closest('.sidebar-module-group');
+        const chevron = btn.querySelector('.sidebar-chevron');
+        if (!parentGroup) return;
+
+        const isOpen = parentGroup.classList.toggle('open');
+        const submenu = parentGroup.querySelector('.sidebar-submenu');
+        
+        if (submenu) {
+            if (isOpen) {
+                submenu.style.display = 'block';
+                submenu.style.maxHeight = '500px';
+                if (chevron) chevron.classList.add('rotate-180');
+            } else {
+                submenu.style.maxHeight = '0px';
+                submenu.style.display = 'none';
+                if (chevron) chevron.classList.remove('rotate-180');
+            }
+        }
+    });
+});
+</script>

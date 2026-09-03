@@ -1,11 +1,11 @@
-﻿<?php
+﻿\<?php
 session_start();
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: index.html");
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'pom_connection.php';
 
 $section_title = "Purchase Order Management";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
@@ -126,9 +126,10 @@ if (!$conn->connect_error) {
     $sql = "SELECT o.order_id, o.order_number, o.supplier_id, o.order_date, o.expected_date,
                    o.status, o.total_amount, s.supplier_name
             FROM orders o
-            LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id";
+            LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id
+            WHERE o.status NOT IN ('Delivered', 'Cancelled')";
     if ($search !== '') {
-        $sql .= " WHERE o.order_number LIKE ? OR s.supplier_name LIKE ?";
+        $sql .= " AND (o.order_number LIKE ? OR s.supplier_name LIKE ?)";
     }
     $sql .= " ORDER BY o.order_date DESC";
 

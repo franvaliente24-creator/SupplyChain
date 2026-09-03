@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'dtrs_connection.php';
 
 $section_title = "Document Tracking & Logistics Records System (DTRS)";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
@@ -55,12 +55,11 @@ $search = isset($_GET['q']) ? trim($_GET['q']) : '';
 
 if (!$conn->connect_error) {
     $sql = "SELECT m.manifest_id, m.manifest_number, m.dispatch_date, m.estimated_delivery, m.actual_delivery_date,
-                   o.order_number,
-                   dc.confirmation_id, dc.received_by, dc.confirmed_at, dc.discrepancy_notes
-            FROM logistics_manifests m
-            LEFT JOIN orders o ON m.order_id = o.order_id
-            LEFT JOIN delivery_confirmations dc ON dc.manifest_id = m.manifest_id
-            WHERE m.delivery_status = 'Delivered'";
+               m.order_number,
+               dc.confirmation_id, dc.received_by, dc.confirmed_at, dc.discrepancy_notes
+        FROM logistics_manifests m
+        LEFT JOIN delivery_confirmations dc ON dc.manifest_id = m.manifest_id
+        WHERE m.delivery_status = 'Delivered'";
     if ($search !== '') {
         $sql .= " AND (m.manifest_number LIKE ? OR o.order_number LIKE ? OR dc.received_by LIKE ?)";
     }

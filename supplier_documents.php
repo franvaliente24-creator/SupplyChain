@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'svm_connection.php';
 
 $section_title = "Supplier Document Management";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
@@ -49,13 +49,16 @@ if ($table_exists && !$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'PO
             
             $stmt = $conn->prepare("INSERT INTO supplier_documents (supplier_id, document_type, document_name, file_path, upload_date, expiry_date, status, uploaded_by) VALUES (?, ?, ?, ?, CURDATE(), ?, 'Active', ?)");
             
+            $supplier_id = (int)$_POST['supplier_id'];
+            $uploaded_by = (int)$_SESSION['user_id'];
+
             $stmt->bind_param("issssi", 
-                (int)$_POST['supplier_id'],
+                $supplier_id,
                 $_POST['document_type'],
                 $_POST['document_name'],
                 $file_path,
                 $expiry_date,
-                (int)$_SESSION['user_id']
+                $uploaded_by
             );
 
             if ($stmt->execute()) {

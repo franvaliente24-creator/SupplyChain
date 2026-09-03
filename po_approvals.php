@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'pom_connection.php';
 
 $section_title = "Purchase Order Management";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
@@ -70,10 +70,9 @@ $search = isset($_GET['q']) ? trim($_GET['q']) : '';
 $orders = [];
 if (!$conn->connect_error) {
     $sql = "SELECT o.order_id, o.order_number, o.supplier_id, o.order_date, o.expected_date,
-                   o.status, o.total_amount, s.supplier_name
-            FROM orders o
-            LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id
-            WHERE o.status IN ('Draft', 'Pending')";
+               o.status, o.total_amount, o.supplier_name
+        FROM orders o
+        WHERE o.status IN ('Draft', 'Pending')";
     if ($search !== '') {
         $sql .= " AND (o.order_number LIKE ? OR s.supplier_name LIKE ?)";
     }

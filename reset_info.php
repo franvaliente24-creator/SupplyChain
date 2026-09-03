@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 0);
 error_reporting(0);
 
 header('Content-Type: application/json');
-require 'db_connection.php'; // Include your database connection
+require 'core_connection.php'; // Include your database connection
 
 // Handle POST request to generate reset token
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

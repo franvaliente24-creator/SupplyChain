@@ -11,7 +11,7 @@ if ($_SESSION['role'] !== 'Administrator') {
     exit();
 }
 
-require_once 'db_connection.php';
+require_once 'core_connection.php';
 
 $section_title = "System Activity Audit Trail";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
