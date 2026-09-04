@@ -3,10 +3,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_CORE_HOST') ?: '';
-$username   = getenv('DB_CORE_USERNAME') ?: '';
-$password   = getenv('DB_CORE_PASSWORD') ?: '';
-$dbname     = getenv('DB_CORE_DATABASE') ?: '';
+$servername = getenv('DB_CORE_HOST') ?: 'mariadb-bzqbcyao.internal';
+$username   = getenv('DB_CORE_USERNAME') ?: 'hf_h22shuncv0';
+$password   = getenv('DB_CORE_PASSWORD') ?: 'CYqvrsOdkS9mibpEvG4wYmgTNNSE63AS';
+$dbname     = getenv('DB_CORE_DATABASE') ?: 'hf_db_bzqbcyao';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
