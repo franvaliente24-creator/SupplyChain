@@ -4,10 +4,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "db_psm";
+$servername = getenv('DB_PSM_HOST') ?: 'localhost';
+$username   = getenv('DB_PSM_USERNAME') ?: 'root';
+$password   = getenv('DB_PSM_PASSWORD') ?: '';
+$dbname     = getenv('DB_PSM_DATABASE') ?: 'db_psm';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);

@@ -3,10 +3,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "db_svm";
+$servername = getenv('DB_SVM_HOST') ?: 'localhost';
+$username   = getenv('DB_SVM_USERNAME') ?: 'root';
+$password   = getenv('DB_SVM_PASSWORD') ?: '';
+$dbname     = getenv('DB_SVM_DATABASE') ?: 'db_svm';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);

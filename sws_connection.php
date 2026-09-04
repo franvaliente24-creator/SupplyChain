@@ -11,10 +11,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "db_sws";
+$servername = getenv('DB_SWS_HOST') ?: 'localhost';
+$username   = getenv('DB_SWS_USERNAME') ?: 'root';
+$password   = getenv('DB_SWS_PASSWORD') ?: '';
+$dbname     = getenv('DB_SWS_DATABASE') ?: 'db_sws';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
@@ -23,7 +23,7 @@ if ($conn->connect_errno) {
     http_response_code(500);
     header('Content-Type: application/json');
 
-    $debug = true; // flip to false before this leaves your machine
+    $debug = getenv('DEBUG_MODE') === 'true';
 
     if ($debug) {
         echo json_encode([
