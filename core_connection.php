@@ -3,10 +3,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_CORE_HOST') ?: 'localhost';
-$username   = getenv('DB_CORE_USERNAME') ?: 'root';
+$servername = getenv('DB_CORE_HOST') ?: '';
+$username   = getenv('DB_CORE_USERNAME') ?: '';
 $password   = getenv('DB_CORE_PASSWORD') ?: '';
-$dbname     = getenv('DB_CORE_DATABASE') ?: 'db_core';
+$dbname     = getenv('DB_CORE_DATABASE') ?: '';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
