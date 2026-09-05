@@ -37,7 +37,10 @@ if (!$email || !$password) {
 $stmt = $conn->prepare('SELECT user_id, username, password_hash, role FROM users WHERE email = ? LIMIT 1');
 if (!$stmt) {
     http_response_code(500);
-    echo json_encode(['message' => 'Server error. Please try again later.']);
+    echo json_encode([
+        'message' => 'SQL prepare error',
+        'sql_error' => $conn->error
+    ]);
     exit;
 }
 $stmt->bind_param('s', $email);
