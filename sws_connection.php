@@ -11,10 +11,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_SWS_HOST') ?: 'localhost';
-$username   = getenv('DB_SWS_USERNAME') ?: 'root';
-$password   = getenv('DB_SWS_PASSWORD') ?: '';
-$dbname     = getenv('DB_SWS_DATABASE') ?: 'db_sws';
+$servername = getenv('DB_SWS_HOST')     ?: getenv('DB_HOST')     ?: 'maria-n9o7nsa7.internal';
+$username   = getenv('DB_SWS_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_ejcnux6zyo';
+$password   = getenv('DB_SWS_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'bg0uMqT7KfIBEcyKRgfg1qimuT6cy9Bv';
+$dbname     = getenv('DB_SWS_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_n9o7nsa7';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);

@@ -3,10 +3,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_DTRS_HOST') ?: 'localhost';
-$username   = getenv('DB_DTRS_USERNAME') ?: 'root';
-$password   = getenv('DB_DTRS_PASSWORD') ?: '';
-$dbname     = getenv('DB_DTRS_DATABASE') ?: 'db_dtrs';
+$servername = getenv('DB_DTRS_HOST')     ?: getenv('DB_HOST')     ?: 'mariadb-hwwfapjm.internal';
+$username   = getenv('DB_DTRS_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_vsobeo5cgb';
+$password   = getenv('DB_DTRS_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'LMZwl7pOx8RtPpkah8dFz9OvqAuH5m43';
+$dbname     = getenv('DB_DTRS_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_hwwfapjm';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);

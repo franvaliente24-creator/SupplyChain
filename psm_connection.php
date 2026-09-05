@@ -4,10 +4,10 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_PSM_HOST') ?: 'localhost';
-$username   = getenv('DB_PSM_USERNAME') ?: 'root';
-$password   = getenv('DB_PSM_PASSWORD') ?: '';
-$dbname     = getenv('DB_PSM_DATABASE') ?: 'db_psm';
+$servername = getenv('DB_PSM_HOST')     ?: getenv('DB_HOST')     ?: 'mariadb-d5ybzwp1.internal';
+$username   = getenv('DB_PSM_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_m30otlrz6e';
+$password   = getenv('DB_PSM_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'Yn4KVfLxI7IVkKrYqPdVPsjZHXLMsNNy';
+$dbname     = getenv('DB_PSM_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_d5ybzwp1';
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
