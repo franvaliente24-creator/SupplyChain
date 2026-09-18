@@ -1,13 +1,5 @@
-﻿\<?php
-// Load centralized session configuration
-require_once __DIR__ . '/session_config.php';
-
-// Load CSRF protection
-require_once __DIR__ . '/csrf_config.php';
-
-// Load RBAC configuration
-require_once __DIR__ . '/rbac_config.php';
-
+\<?php
+session_start();
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: index.html");
     exit();

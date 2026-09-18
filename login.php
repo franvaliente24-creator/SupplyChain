@@ -14,6 +14,18 @@ require_once __DIR__ . '/input_validation.php';
 
 header('Content-Type: application/json');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
+
 require 'core_connection.php'; // Include your database connection
 
 // Get the JSON data from the request
