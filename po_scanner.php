@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['qr_data'])) {
 </head>
 <body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 
-    <?php include 'sidebar.php'; ?>
+    <?php include __DIR__ . '/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
         <header class="bg-white shadow-sm border-b border-slate-200 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">

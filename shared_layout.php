@@ -79,7 +79,7 @@ $additional_head = $additional_head ?? '';
 
     <!-- Main Content Wrapper -->
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <?php include 'header.php'; ?>
+        <?php include __DIR__ . '/header.php'; ?>
         
         <main class="flex-1 overflow-y-auto bg-surface-dim p-3 sm:p-6 md:p-10 text-on-surface antialiased overflow-x-hidden w-full max-w-full">
             <?php if ($flash_message): ?>

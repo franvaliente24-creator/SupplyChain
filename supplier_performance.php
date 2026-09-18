@@ -55,10 +55,10 @@ if (!$conn->connect_error) {
 </head>
 <body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 
-    <?php include 'sidebar.php'; ?>
+    <?php include __DIR__ . '/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <?php include 'header.php'; ?>
+        <?php include __DIR__ . '/header.php'; ?>
 <main class="flex-1 overflow-y-auto bg-surface-container-lowest p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div>
