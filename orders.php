@@ -1,4 +1,4 @@
-\<?php
+<?php
 // Load security configurations
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/csrf_config.php';
@@ -17,8 +17,7 @@ if (!checkSessionTimeout()) {
     exit();
 }
 
-// Check RBAC permissions
-requirePageAccess('orders');
+
 
 // Validate CSRF token for POST requests
 requireCsrfProtection();

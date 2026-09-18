@@ -1,12 +1,16 @@
 <?php
 require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/csrf_config.php';
 require_once __DIR__ . '/rbac_config.php';
+
 requirePageAccess('suppliers');
-require_once 'svm_connection.php';
+requireCsrfProtection();
+
+require_once __DIR__ . '/svm_connection.php';
 
 $section_title = "Supplier / Vendor Management";
 $admin_user = $_SESSION['username'] ?? 'Admin User';
-$user_role = $_SESSION['role'] ?? 'Supply Chain Manager';
+$user_role = $_SESSION['role'] ?? 'manager';
 
 $db_error = null;
 $flash = null;
@@ -117,43 +121,14 @@ if (!$conn->connect_error) {
 } else {
     $db_error = "Database connection offline.";
 }
+// Set shared layout variables.
+$page_title = 'Supplier / Vendor Management';
+$flash_message = $flash ?? null;
+$error_message = $db_error ?? null;
+
+ob_start();
 ?>
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title><?php echo $section_title; ?> — Console</title>
-    <link href="app.css" rel="stylesheet"/>
-    <script src="app.js" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <style>
-        .status-badge-active      { background: #dcfce7; color: #166534; }
-        .status-badge-critical    { background: #fee2e2; color: #991b1b; }
-        
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(15,23,42,0.55);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; padding: 1rem;
-        }
-        .modal-box {
-            background: #fff; border-radius: 1rem; width: 100%; max-width: 32rem;
-            padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        .form-field { margin-bottom: 1rem; }
-        .form-field label { display:block; font-size:0.75rem; font-weight:600; margin-bottom:0.25rem; color:#475569; }
-        .form-field input, .form-field select {
-            width:100%; padding:0.5rem 0.75rem; border:1px solid #cbd5e1; border-radius:0.5rem; font-size:0.875rem;
-        }
-    </style>
-</head>
-<body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 
-    <?php include __DIR__ . '/sidebar.php'; ?>
-
-    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <?php include __DIR__ . '/header.php'; ?>
 <main class="flex-1 overflow-y-auto bg-surface-container-lowest p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -363,5 +338,8 @@ if (!$conn->connect_error) {
             document.getElementById('supplier-modal').style.display = 'none';
         }
     </script>
-</body>
-</html>
+<?php
+$content = ob_get_clean();
+require_once __DIR__ . '/shared_layout.php';
+?>
+
