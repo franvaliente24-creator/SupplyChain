@@ -162,6 +162,16 @@ function getSubsystemById(id) {
   return subsystemsData[id] || subsystemsData['supply-chain'];
 }
 
+function getModuleById(subsystemId, moduleId) {
+  const subsystem = getSubsystemById(subsystemId);
+
+  if (!subsystem || !Array.isArray(subsystem.modules)) {
+    return null;
+  }
+
+  return subsystem.modules.find(mod => mod.id === moduleId) || null;
+}
+
 function normalizeModule(mod) {
   return {
     id: mod.id || '',

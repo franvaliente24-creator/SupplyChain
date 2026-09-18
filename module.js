@@ -11,17 +11,15 @@ function renderModulePage() {
     const sidebarDashboardLink = document.getElementById('sidebar-dashboard-link');
     const moduleContent = document.getElementById('module-content');
 
-    // Guard against false redirects - only redirect if subsystems.js has loaded and module genuinely doesn't exist
-    if (typeof SUBSYSTEMS === 'undefined' || !subsystem || (moduleId && !module) || !moduleContent) {
-        // If we're on a module page but the module lookup failed, only redirect if we're confident
-        // This prevents race conditions from causing false redirects
-        if (typeof SUBSYSTEMS !== 'undefined' && subsystem && moduleId && !module) {
-            // Module genuinely doesn't exist
+    // Guard against missing data
+    if (!subsystem || (moduleId && !module) || !moduleContent) {
+        // If we're on a module page but the module lookup failed, redirect
+        if (subsystem && moduleId && !module) {
             window.location.replace(getDashboardHref(subsystemId));
             return;
         }
         // If subsystems.js hasn't loaded yet, wait and try again
-        if (typeof SUBSYSTEMS === 'undefined') {
+        if (!subsystem) {
             setTimeout(renderModulePage, 100);
             return;
         }
@@ -115,14 +113,14 @@ function renderModulePage() {
 
     // Module-specific primary action button
     let primaryActionButton = '';
-    if (moduleId === 'sws') {
+    if (moduleId === 'smart-warehousing-system') {
         primaryActionButton = `
             <button id="module-primary-action" class="btn-primary dashboard-action-button m-0">
                 <span class="material-symbols-outlined">qr_code_scanner</span>
                 Scan Asset QR
             </button>
         `;
-    } else if (moduleId === 'dtrs') {
+    } else if (moduleId === 'document-tracking-logistics') {
         primaryActionButton = `
             <button id="module-primary-action" class="btn-primary dashboard-action-button m-0">
                 <span class="material-symbols-outlined">local_shipping</span>
@@ -299,7 +297,7 @@ function wireQuickActionButtons(moduleId) {
     if (!workspaceBtn || !recordsBtn || !exportBtn) return;
 
     switch (moduleId) {
-        case 'sws':
+        case 'smart-warehousing-system':
             workspaceBtn.addEventListener('click', () => {
                 renderSWSWorkspace();
             });
@@ -315,7 +313,7 @@ function wireQuickActionButtons(moduleId) {
                 });
             }
             break;
-        case 'ims':
+        case 'inventory-management-system':
             workspaceBtn.addEventListener('click', () => {
                 renderIMSWorkspace();
             });
@@ -326,7 +324,7 @@ function wireQuickActionButtons(moduleId) {
                 exportIMSReport();
             });
             break;
-        case 'psm':
+        case 'procurement-sourcing-management':
             workspaceBtn.addEventListener('click', () => {
                 renderPSMWorkspace();
             });
@@ -337,7 +335,7 @@ function wireQuickActionButtons(moduleId) {
                 exportPSMReport();
             });
             break;
-        case 'svm':
+        case 'supplier-vendor-management':
             workspaceBtn.addEventListener('click', () => {
                 renderSVMWorkspace();
             });
@@ -348,7 +346,7 @@ function wireQuickActionButtons(moduleId) {
                 exportSVMReport();
             });
             break;
-        case 'pom':
+        case 'purchase-order-management':
             workspaceBtn.addEventListener('click', () => {
                 renderPOMWorkspace();
             });
@@ -359,7 +357,7 @@ function wireQuickActionButtons(moduleId) {
                 exportPOMReport();
             });
             break;
-        case 'dtrs':
+        case 'document-tracking-logistics':
             workspaceBtn.addEventListener('click', () => {
                 renderDTRSWorkspace();
             });
@@ -3218,7 +3216,7 @@ function addModuleModals(moduleId) {
     const existingModals = document.querySelectorAll('.module-specific-modal');
     existingModals.forEach(m => m.remove());
 
-    if (moduleId === 'sws') {
+    if (moduleId === 'smart-warehousing-system') {
         const modalHTML = `
             <div id="sws-scan-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200 module-specific-modal" onclick="if(event.target.id==='sws-scan-modal') closeDashboardModal('sws-scan-modal')">
                 <div class="bg-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/30 relative transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
@@ -3256,7 +3254,7 @@ function addModuleModals(moduleId) {
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-    } else if (moduleId === 'dtrs') {
+    } else if (moduleId === 'document-tracking-logistics') {
         const modalHTML = `
             <div id="dtrs-waybill-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200 module-specific-modal" onclick="if(event.target.id==='dtrs-waybill-modal') closeDashboardModal('dtrs-waybill-modal')">
                 <div class="bg-surface rounded-3xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/30 relative transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
@@ -3504,37 +3502,37 @@ function trackAssetReturn(assetId) {
 
 function getModuleKPIs(moduleId) {
     const kpiMap = {
-        'sws': [
+        'smart-warehousing-system': [
             { label: 'Total Assets', value: '1,247', icon: 'inventory_2', tone: 'neutral', trend: '+12', trendDirection: 'up' },
             { label: 'Zone Utilization', value: '68%', icon: 'warehouse', tone: 'positive', trend: '+5%', trendDirection: 'up' },
             { label: 'Pending Tasks', value: '23', icon: 'task_alt', tone: 'caution', trend: '-3', trendDirection: 'down' },
             { label: 'Cycle Count Accuracy', value: '99.2%', icon: 'check_circle', tone: 'positive', trend: '+0.3%', trendDirection: 'up' }
         ],
-        'ims': [
+        'inventory-management-system': [
             { label: 'Total SKUs', value: '3,892', icon: 'inventory_2', tone: 'neutral', trend: '+45', trendDirection: 'up' },
             { label: 'Low Stock Alerts', value: '12', icon: 'warning', tone: 'caution', trend: '+2', trendDirection: 'up' },
             { label: 'Stock Accuracy', value: '98.5%', icon: 'check_circle', tone: 'positive', trend: '+0.2%', trendDirection: 'up' },
             { label: 'Pending Adjustments', value: '8', icon: 'edit', tone: 'neutral', trend: '-1', trendDirection: 'down' }
         ],
-        'psm': [
+        'procurement-sourcing-management': [
             { label: 'Open Requisitions', value: '34', icon: 'description', tone: 'neutral', trend: '+5', trendDirection: 'up' },
             { label: 'Pending Approval', value: '7', icon: 'pending', tone: 'caution', trend: '-2', trendDirection: 'down' },
             { label: 'Avg Approval Time', value: '2.3 days', icon: 'schedule', tone: 'positive', trend: '-0.5d', trendDirection: 'down' },
             { label: 'Active RFQs', value: '15', icon: 'request_quote', tone: 'neutral', trend: '+3', trendDirection: 'up' }
         ],
-        'svm': [
+        'supplier-vendor-management': [
             { label: 'Active Vendors', value: '48', icon: 'business', tone: 'neutral', trend: '+2', trendDirection: 'up' },
             { label: 'Avg Score', value: '4.6/5', icon: 'star', tone: 'positive', trend: '+0.1', trendDirection: 'up' },
             { label: 'Expiring Contracts', value: '5', icon: 'event', tone: 'caution', trend: '+1', trendDirection: 'up' },
             { label: 'On-Time Delivery', value: '94%', icon: 'local_shipping', tone: 'positive', trend: '+2%', trendDirection: 'up' }
         ],
-        'pom': [
+        'purchase-order-management': [
             { label: 'Open POs', value: '72', icon: 'receipt_long', tone: 'neutral', trend: '+8', trendDirection: 'up' },
             { label: 'Overdue POs', value: '6', icon: 'warning', tone: 'caution', trend: '+1', trendDirection: 'up' },
             { label: 'PO Value (MTD)', value: '$245K', icon: 'attach_money', tone: 'positive', trend: '+$32K', trendDirection: 'up' },
             { label: '3-Way Match Rate', value: '97%', icon: 'check_circle', tone: 'positive', trend: '+1%', trendDirection: 'up' }
         ],
-        'dtrs': [
+        'document-tracking-logistics': [
             { label: 'Active Shipments', value: '28', icon: 'local_shipping', tone: 'neutral', trend: '+4', trendDirection: 'up' },
             { label: 'In Transit', value: '19', icon: 'flight', tone: 'positive', trend: '+3', trendDirection: 'up' },
             { label: 'Exceptions', value: '3', icon: 'error', tone: 'caution', trend: '-1', trendDirection: 'down' },
