@@ -1,5 +1,10 @@
 \<?php
-session_start();
+// Load security configurations
+require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/csrf_config.php';
+require_once __DIR__ . '/rbac_config.php';
+
+// Check authentication
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: index.html");
     exit();
@@ -236,21 +241,18 @@ function orderStatusMeta($status) {
 }
 
 $editable_statuses_json = json_encode($editable_statuses);
-?>
-<!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-    <link href="app.css" rel="stylesheet"/>
-    <script src="app.js" defer></script>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Purchase Order Management — Orders</title>
+
+// Set up shared layout variables
+$page_title = "Purchase Order Management — Orders";
+$flash_message = $flash;
+$error_message = $db_error;
+$additional_head = '
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
         * { box-sizing: border-box !important; }
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-variation-settings: \'FILL\' 0, \'wght\' 400, \'GRAD\' 0, \'opsz\' 24;
         }
         .status-badge {
             display: inline-block;
@@ -293,43 +295,32 @@ $editable_statuses_json = json_encode($editable_statuses);
         .items-header { display:grid; grid-template-columns: 1fr 5.5rem 6rem 5.5rem 2rem; gap:0.5rem; font-size:0.65rem; font-weight:700; text-transform:uppercase; color:#94a3b8; margin-bottom:0.35rem; }
         .locked-note { font-size: 0.7rem; color: #94a3b8; font-style: italic; }
     </style>
-</head>
-<body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
+';
 
-    <?php include 'sidebar.php'; ?>
+// Start content capture
+ob_start();
+?>
 
-    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <?php include 'header.php'; ?>
-        <main class="flex-1 overflow-y-auto bg-surface-dim p-3 sm:p-6 md:p-10 text-on-surface antialiased overflow-x-hidden w-full max-w-full">
-            <div class="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 min-w-0">
+<div class="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 min-w-0">
 
-                <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-outline-variant/60 w-full max-w-full">
-                    <div class="space-y-1.5 min-w-0 flex-1">
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-[16px]">receipt_long</span>
-                            Purchase Order Management
-                        </div>
-                        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-on-surface tracking-tight break-words">Purchase Orders</h1>
-                        <p class="text-on-surface-variant text-xs sm:text-sm md:text-base leading-relaxed break-words">
-                            Line items from <code>order_items</code>, joined with suppliers and inventory. Total is computed automatically.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
-                        <button type="button" onclick="openAddModal()" class="px-4 py-2 bg-primary text-on-primary rounded-lg text-xs sm:text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center justify-center gap-1.5">
-                            <span class="material-symbols-outlined text-[18px]">add_circle</span>
-                            New Order
-                        </button>
-                    </div>
-                </header>
-
-                <?php if ($flash): ?>
-                    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-lg">
-                        ✅ <?php echo htmlspecialchars($flash); ?>
-                    </div>
-                <?php endif; ?>
-                <?php if ($db_error): ?>
-                    <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                        ⚠️ <?php echo htmlspecialchars($db_error); ?>
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-outline-variant/60 w-full max-w-full">
+        <div class="space-y-1.5 min-w-0 flex-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                Purchase Order Management
+            </div>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-on-surface tracking-tight break-words">Purchase Orders</h1>
+            <p class="text-on-surface-variant text-xs sm:text-sm md:text-base leading-relaxed break-words">
+                Line items from <code>order_items</code>, joined with suppliers and inventory. Total is computed automatically.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+            <button type="button" onclick="openAddModal()" class="px-4 py-2 bg-primary text-on-primary rounded-lg text-xs sm:text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                New Order
+            </button>
+        </div>
+    </header> ?>
                     </div>
                 <?php endif; ?>
 
@@ -690,7 +681,12 @@ $editable_statuses_json = json_encode($editable_statuses);
                     document.getElementById('view-modal').style.display = 'none';
                 }
             </script>
-        </main>
-    </div>
-</body>
-</html>
+</div>
+
+<?php
+// End content capture
+$content = ob_get_clean();
+
+// Include shared layout
+require_once 'shared_layout.php';
+?>

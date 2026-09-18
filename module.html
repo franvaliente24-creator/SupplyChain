@@ -3,6 +3,7 @@
 <head>
 <link href="app.css" rel="stylesheet"/>
 <script src="subsystems.js" defer></script>
+<script src="unified_sidebar.js" defer></script>
 <script src="session-profile.js" defer></script>
 <script src="app.js" defer></script>
 <script src="module.js" defer></script>
@@ -10,8 +11,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Module</title>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,22 +20,25 @@
 </head>
 <body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 <div id="sidebar-backdrop" class="fixed top-16 bottom-0 left-0 right-0 md:inset-0 bg-gray-900/50 backdrop-blur-md z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+<!-- Unified Sidebar -->
 <aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-outline-variant/30 flex flex-col shrink-0 transition-all duration-300 relative overflow-visible">
-    <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-[60]"></div>
-    <div class="sidebar-brand-section">
-        <div class="sidebar-brand-card">
-            <div class="sidebar-brand-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-primary text-xl">inventory_2</span>
-            </div>
-            <div class="sidebar-brand-title" id="sidebar-brand-title">Supply Chain</div>
-            <div class="sidebar-brand-subtitle" id="sidebar-brand-category">Management System</div>
-        </div>
-    </div>
+    <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-40"></div>
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
-        <a id="sidebar-dashboard-link" class="sidebar-main-link" href="dashboard.html?subsystem=supply-chain">
-            <span class="sidebar-main-link-icon material-symbols-outlined">dashboard</span>
-            <span class="font-label font-medium text-sm">Dashboard</span>
+        <div class="sidebar-brand-section">
+            <div class="sidebar-brand-card">
+                <div class="sidebar-brand-icon w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src="img/logo.png" alt="Supply Chain Logo" class="w-full h-full object-cover"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Link -->
+        <a id="sidebar-dashboard-link" class="sidebar-main-link flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-medium text-xs transition" href="dashboard.html?subsystem=supply-chain">
+            <span class="material-symbols-outlined text-indigo-600 text-[18px]">dashboard</span>
+            <span>Dashboard</span>
         </a>
+
+        <!-- Module Navigation Container -->
         <div id="sidebar-subsystem-nav-panel" class="sidebar-subsystem-nav-panel">
             <nav id="sidebar-subsystem-modules-nav" class="sidebar-subsystem-modules"></nav>
         </div>
@@ -43,7 +47,7 @@
 <div class="flex-1 flex flex-col h-full overflow-hidden relative">
 <header class="bg-surface/80 backdrop-blur-md shadow-sm border-b border-outline-variant/30 flex justify-between items-center h-16 px-6 w-full z-30 shrink-0">
 <div class="flex items-center gap-3">
-<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f1f5f9'/%3E%3Cpath d='M10 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm12 6H10l4-5 2.5 3 2-2.5 3.5 4.5z' fill='%23cbd5e1'/%3E%3C/svg%3E" alt="Logo" class="w-8 h-8 rounded-lg object-cover border border-outline-variant/30 shadow-2xs shrink-0">
+<img src="img/logo.png" alt="Supply Chain Logo" class="w-10 h-10 rounded-lg object-cover shrink-0">
 <span class="text-outline-variant font-light select-none">|</span>
 <button id="desktop-sidebar-toggle" type="button" class="flex items-center justify-center p-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low focus:outline-none transition border border-outline-variant/30 shrink-0 min-w-[2.5rem] min-h-[2.5rem]" title="Close Sidebar">
 <span class="material-symbols-outlined text-xl" id="sidebar-toggle-icon">menu_open</span>
@@ -55,7 +59,7 @@
 </button>
 <button id="profile-dropdown-toggle" type="button" class="flex items-center gap-3 p-1.5 rounded-full hover:bg-surface-container-low transition-colors focus:outline-none border border-transparent hover:border-outline-variant/30 cursor-pointer" aria-expanded="false" title="Account Menu">
 <div class="w-9 h-9 rounded-full bg-primary-container/30 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm shadow-2xs shrink-0 overflow-hidden">
-  <img src="/SupplyChain/Image/profile.jpg" alt="User profile" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+  <img src="img/profile.jpg" alt="User profile" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
   <span style="display:none;" class="w-full h-full items-center justify-center">AU</span>
 </div>
 
