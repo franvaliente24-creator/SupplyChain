@@ -53,6 +53,14 @@ $additional_head = $additional_head ?? '';
                     <div class="sidebar-brand-icon w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                         <img src="img/logo.png" alt="Supply Chain Logo" class="w-full h-full object-cover"/>
                     </div>
+
+                    <div class="sidebar-brand-title" id="sidebar-brand-title">
+                        Supply Chain Management System
+                    </div>
+
+                    <div class="sidebar-brand-subtitle" id="sidebar-brand-category">
+                        Logistics & Inventory Operations
+                    </div>
                 </div>
             </div>
 

@@ -188,3 +188,5 @@ function getDashboardHref(subsystemId) {
 function getModuleHref(subsystemId, moduleId) {
   return `module.html?subsystem=${encodeURIComponent(subsystemId || 'supply-chain')}&module=${encodeURIComponent(moduleId)}`;
 }
+
+window.subsystemsData = subsystemsData;
