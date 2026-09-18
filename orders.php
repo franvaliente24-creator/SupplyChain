@@ -3,6 +3,7 @@
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/csrf_config.php';
 require_once __DIR__ . '/rbac_config.php';
+requirePageAccess('orders');
 
 // Check authentication
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {

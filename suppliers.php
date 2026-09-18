@@ -1,10 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header("Location: index.html");
-    exit();
-}
-
+require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/rbac_config.php';
+requirePageAccess('suppliers');
 require_once 'svm_connection.php';
 
 $section_title = "Supplier / Vendor Management";

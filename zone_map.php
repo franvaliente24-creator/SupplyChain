@@ -142,10 +142,9 @@ function usageBarColor($pct) {
 </head>
 <body class="bg-background text-on-background font-body h-screen flex flex-row overflow-hidden">
 
-    <?php include __DIR__ . '/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <?php include __DIR__ . '/header.php'; ?>
+        
         <main class="flex-1 overflow-y-auto bg-surface-container-lowest p-6 md:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -303,3 +302,10 @@ function usageBarColor($pct) {
     </script>
 </body>
 </html>
+
+<?php
+$page_title = 'Zone Map';
+// Your page HTML goes here
+require_once __DIR__ . '/shared_layout.php';
+?>
+

@@ -1,9 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header("Location: index.html");
-    exit();
-}
+require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/rbac_config.php';
+requirePageAccess('user_management');
 
 // Only administrators can access user management
 if ($_SESSION['role'] !== 'Administrator') {

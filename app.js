@@ -12,14 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initProfileDropdown();
 
     // Check if the page has the specific dashboard sidebar elements
-    const usesDynamicSidebar =
-        document.querySelector('#sidebar-subsystem-nav-panel') &&
-        document.querySelector('#sidebar-subsystem-modules-nav');
-
-    // Only fire the JS sidebar controller if we are on the dashboard
-    if (usesDynamicSidebar) {
-        initSidebarController();
-    }
+   const hasUnifiedSidebar = document.querySelector('#sidebar-subsystem-modules-nav') !== null;
+if (!hasUnifiedSidebar) {
+    initSidebarController();
+}
 });
 
 /**

@@ -6,6 +6,9 @@ error_reporting(0);
 header('Content-Type: application/json');
 require 'core_connection.php'; // Include your database connection
 
+require_once __DIR__ . '/csrf_config.php';
+requireCsrfProtection();
+
 // Handle POST request to generate reset token
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
