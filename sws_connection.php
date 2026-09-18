@@ -7,14 +7,26 @@
 // and qr_generator.php's asset_id branch) should require THIS file
 // instead of db_connection.php.
 
+// Load environment variables from .env file
+require_once __DIR__ . '/load_env.php';
+
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_SWS_HOST')     ?: getenv('DB_HOST')     ?: 'mariadb-n9o7nsa7.internal';
-$username   = getenv('DB_SWS_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_ejcnux6zyo';
-$password   = getenv('DB_SWS_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'bg0uMqT7KfIBEcyKRgfg1qimuT6cy9Bv';
-$dbname     = getenv('DB_SWS_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_n9o7nsa7';
+// Fetch environment variables - NO HARDCODED FALLBACKS
+$servername = getenv('DB_SWS_HOST');
+$username   = getenv('DB_SWS_USERNAME');
+$password   = getenv('DB_SWS_PASSWORD');
+$dbname     = getenv('DB_SWS_DATABASE');
+
+// Validate that required environment variables are set
+if (!$servername || !$username || !$dbname) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'Database configuration incomplete. Please set DB_SWS_HOST, DB_SWS_USERNAME, DB_SWS_PASSWORD, and DB_SWS_DATABASE environment variables.']);
+    exit;
+}
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
@@ -22,20 +34,7 @@ $conn = @new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_errno) {
     http_response_code(500);
     header('Content-Type: application/json');
-
-    $debug = getenv('DEBUG_MODE') === 'true';
-
-    if ($debug) {
-        echo json_encode([
-            'message' => 'Service temporarily unavailable.',
-            'debug_error' => $conn->connect_error,
-            'debug_errno' => $conn->connect_errno,
-            'debug_host'  => $servername,
-            'debug_db'    => $dbname
-        ]);
-    } else {
-        echo json_encode(['message' => 'Service temporarily unavailable.']);
-    }
+    echo json_encode(['message' => 'Service temporarily unavailable.']);
     exit;
 }
 

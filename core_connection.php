@@ -1,6 +1,9 @@
 <?php
+// Load environment variables from .env file
+require_once __DIR__ . '/load_env.php';
+
 // Check for debug mode from environment variables
-$debugMode = getenv('DEBUG_MODE') === 'true' || getenv('DEBUG_MODE') === '1';
+$debugMode = getenv('APP_DEBUG') === 'true' || getenv('APP_DEBUG') === '1';
 
 if ($debugMode) {
     ini_set('display_errors', 1);
@@ -12,33 +15,30 @@ if ($debugMode) {
     error_reporting(0);
 }
 
-// Dynamically fetch environment variables with double fallbacks
-$servername = getenv('DB_CORE_HOST')     ?: getenv('DB_HOST')     ?: 'mariadb-bzqbcyao.internal';
-$username   = getenv('DB_CORE_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_h22shuncv0';
-$password   = getenv('DB_CORE_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'CYqvrsOdkS9mibpEvG4wYmgTNNSE63AS';
-$dbname     = getenv('DB_CORE_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_bzqbcyao';
+// Fetch environment variables - NO HARDCODED FALLBACKS
+$servername = getenv('DB_CORE_HOST');
+$username   = getenv('DB_CORE_USERNAME');
+$password   = getenv('DB_CORE_PASSWORD');
+$dbname     = getenv('DB_CORE_DATABASE');
+
+// Validate that required environment variables are set
+if (!$servername || !$username || !$dbname) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'Database configuration incomplete. Please set DB_CORE_HOST, DB_CORE_USERNAME, DB_CORE_PASSWORD, and DB_CORE_DATABASE environment variables.']);
+    exit;
+}
 
 mysqli_report(MYSQLI_REPORT_OFF);
 
 // Attempt database connection
 $conn = @new mysqli($servername, $username, $password, $dbname);
 
-// Handle connection failures cleanly
+// Handle connection failures cleanly - NO DEBUG INFO EXPOSED
 if ($conn->connect_errno) {
     http_response_code(500);
     header('Content-Type: application/json');
-
-    if ($debugMode) {
-        echo json_encode([
-            'message'     => 'Database connection failed.',
-            'debug_error' => $conn->connect_error,
-            'debug_errno' => $conn->connect_errno,
-            'debug_host'  => $servername,
-            'debug_db'    => $dbname
-        ]);
-    } else {
-        echo json_encode(['message' => 'Service temporarily unavailable.']);
-    }
+    echo json_encode(['message' => 'Service temporarily unavailable.']);
     exit;
 }
 

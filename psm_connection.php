@@ -1,13 +1,25 @@
 <?php
 // psm_connection.php — Dedicated connection for Procurement & Sourcing Management (db_psm)
+// Load environment variables from .env file
+require_once __DIR__ . '/load_env.php';
+
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
 
-$servername = getenv('DB_PSM_HOST')     ?: getenv('DB_HOST')     ?: 'mariadb-d5ybzwp1.internal';
-$username   = getenv('DB_PSM_USERNAME') ?: getenv('DB_USERNAME') ?: 'hf_m30otlrz6e';
-$password   = getenv('DB_PSM_PASSWORD') ?: getenv('DB_PASSWORD') ?: 'Yn4KVfLxI7IVkKrYqPdVPsjZHXLMsNNy';
-$dbname     = getenv('DB_PSM_DATABASE') ?: getenv('DB_DATABASE') ?: 'hf_db_d5ybzwp1';
+// Fetch environment variables - NO HARDCODED FALLBACKS
+$servername = getenv('DB_PSM_HOST');
+$username   = getenv('DB_PSM_USERNAME');
+$password   = getenv('DB_PSM_PASSWORD');
+$dbname     = getenv('DB_PSM_DATABASE');
+
+// Validate that required environment variables are set
+if (!$servername || !$username || !$dbname) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'Database configuration incomplete. Please set DB_PSM_HOST, DB_PSM_USERNAME, DB_PSM_PASSWORD, and DB_PSM_DATABASE environment variables.']);
+    exit;
+}
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
@@ -15,10 +27,7 @@ $conn = @new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_errno) {
     http_response_code(500);
     header('Content-Type: application/json');
-    echo json_encode([
-        'message' => 'Procurement & Sourcing database service unavailable.',
-        'error'   => $conn->connect_error
-    ]);
+    echo json_encode(['message' => 'Service temporarily unavailable.']);
     exit;
 }
 

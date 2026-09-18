@@ -1,9 +1,29 @@
 ﻿\<?php
-session_start();
+// Load centralized session configuration
+require_once __DIR__ . '/session_config.php';
+
+// Load CSRF protection
+require_once __DIR__ . '/csrf_config.php';
+
+// Load RBAC configuration
+require_once __DIR__ . '/rbac_config.php';
+
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: index.html");
     exit();
 }
+
+// Check session timeout
+if (!checkSessionTimeout()) {
+    header("Location: index.html");
+    exit();
+}
+
+// Check RBAC permissions
+requirePageAccess('orders');
+
+// Validate CSRF token for POST requests
+requireCsrfProtection();
 
 require_once 'pom_connection.php';
 
@@ -22,18 +42,29 @@ $editable_statuses = ['Draft', 'Pending'];
 if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
+    if ($action === 'add') {
+        requirePermission('orders.create');
+    } elseif ($action === 'edit') {
+        requirePermission('orders.edit');
+    }
+
     if ($action === 'add' || $action === 'edit') {
         $item_ids    = $_POST['item_id'] ?? [];
         $quantities  = $_POST['quantity'] ?? [];
         $unit_prices = $_POST['unit_price'] ?? [];
 
-        $lines = [];
-        for ($i = 0; $i < count($item_ids); $i++) {
-            $iid   = (int)($item_ids[$i] ?? 0);
-            $qty   = (int)($quantities[$i] ?? 0);
-            $price = (float)($unit_prices[$i] ?? 0);
-            if ($iid > 0 && $qty > 0) {
-                $lines[] = ['item_id' => $iid, 'quantity' => $qty, 'unit_price' => $price];
+        // Validate input arrays
+        if (!is_array($item_ids) || !is_array($quantities) || !is_array($unit_prices)) {
+            $db_error = "Invalid form data format.";
+        } else {
+            $lines = [];
+            for ($i = 0; $i < count($item_ids); $i++) {
+                $iid   = (int)($item_ids[$i] ?? 0);
+                $qty   = (int)($quantities[$i] ?? 0);
+                $price = (float)($unit_prices[$i] ?? 0);
+                if ($iid > 0 && $qty > 0) {
+                    $lines[] = ['item_id' => $iid, 'quantity' => $qty, 'unit_price' => $price];
+                }
             }
         }
 
@@ -103,6 +134,8 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'delete') {
+        requirePermission('orders.delete');
+        
         $order_id = (int)$_POST['order_id'];
         $stmt = $conn->prepare("DELETE FROM orders WHERE order_id = ?");
         $stmt->bind_param("i", $order_id);
@@ -117,6 +150,15 @@ if (!$conn->connect_error && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';
 
+// Sanitize search input to prevent SQL injection via LIKE metacharacters
+function escapeLikeString($string) {
+    // Escape backslashes and wildcards for LIKE queries
+    $escaped = addcslashes($string, '\\%_');
+    return $escaped;
+}
+
+$sanitizedSearch = $search !== '' ? escapeLikeString($search) : '';
+
 $orders = [];
 $suppliers = [];
 $inventory_items = [];
@@ -128,14 +170,14 @@ if (!$conn->connect_error) {
             FROM orders o
             LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id
             WHERE o.status NOT IN ('Delivered', 'Cancelled')";
-    if ($search !== '') {
+    if ($sanitizedSearch !== '') {
         $sql .= " AND (o.order_number LIKE ? OR s.supplier_name LIKE ?)";
     }
     $sql .= " ORDER BY o.order_date DESC";
 
-    if ($search !== '') {
+    if ($sanitizedSearch !== '') {
         $stmt = $conn->prepare($sql);
-        $like = "%$search%";
+        $like = "%$sanitizedSearch%";
         $stmt->bind_param("ss", $like, $like);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -304,16 +346,16 @@ $editable_statuses_json = json_encode($editable_statuses);
                     <div class="bg-surface-container-lowest border-b border-outline-variant/60 p-3 sm:px-6 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <form method="get" class="relative w-full sm:max-w-sm">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-                            <input type="text" name="q" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search PO number or supplier..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-outline-variant/80 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"/>
+                            <input type="text" name="q" value="<?php echo htmlspecialchars($sanitizedSearch); ?>" placeholder="Search PO number or supplier..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-outline-variant/80 bg-surface-container-lowest text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"/>
                         </form>
                         <div class="flex items-center gap-2">
-                            <?php if ($search !== ''): ?>
+                            <?php if ($sanitizedSearch !== ''): ?>
                                 <a href="orders.php" class="px-3 py-2 rounded-lg border border-outline-variant/80 text-xs sm:text-sm font-medium text-on-surface hover:bg-surface-container transition-colors inline-flex items-center gap-1.5">
                                     <span class="material-symbols-outlined text-[18px]">close</span>
                                     Clear
                                 </a>
                             <?php endif; ?>
-                            <a href="orders.php<?php echo $search !== '' ? '?q=' . urlencode($search) : ''; ?>" class="px-3 py-2 rounded-lg border border-outline-variant/80 text-xs sm:text-sm font-medium text-on-surface hover:bg-surface-container transition-colors inline-flex items-center gap-1.5">
+                            <a href="orders.php<?php echo $search !== '' ? '?q=' . urlencode($sanitizedSearch) : ''; ?>" class="px-3 py-2 rounded-lg border border-outline-variant/80 text-xs sm:text-sm font-medium text-on-surface hover:bg-surface-container transition-colors inline-flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-[18px]">refresh</span>
                                 Refresh
                             </a>
@@ -338,7 +380,7 @@ $editable_statuses_json = json_encode($editable_statuses);
                                 <?php if (empty($orders)): ?>
                                     <tr>
                                         <td colspan="8" class="px-6 py-10 text-center text-on-surface-variant text-sm">
-                                            <?php echo $search !== '' ? 'No orders match your search.' : 'No purchase orders found yet.'; ?>
+                                            <?php echo $sanitizedSearch !== '' ? 'No orders match your search.' : 'No purchase orders found yet.'; ?>
                                         </td>
                                     </tr>
                                 <?php else: ?>
@@ -368,6 +410,7 @@ $editable_statuses_json = json_encode($editable_statuses);
                                                             <span class="material-symbols-outlined text-[18px]">edit</span>
                                                         </button>
                                                         <form method="post" onsubmit="return confirm('Delete this order? This cannot be undone.');" class="inline">
+                                                            <?php echo csrfTokenField(); ?>
                                                             <input type="hidden" name="action" value="delete"/>
                                                             <input type="hidden" name="order_id" value="<?php echo (int)$order['order_id']; ?>"/>
                                                             <button type="submit" title="Delete Order" class="p-1.5 rounded-lg text-on-surface-variant hover:text-red-600 hover:bg-red-50 transition-colors">
@@ -429,6 +472,7 @@ $editable_statuses_json = json_encode($editable_statuses);
                         </button>
                     </div>
                     <form method="post" class="space-y-3" id="order-form">
+                        <?php echo csrfTokenField(); ?>
                         <input type="hidden" name="action" id="form-action" value="add"/>
                         <input type="hidden" name="order_id" id="form-order-id" value=""/>
                         <div class="grid grid-cols-2 gap-3">
@@ -505,6 +549,24 @@ $editable_statuses_json = json_encode($editable_statuses);
             </div>
 
             <script>
+                // Set CSRF token for AJAX requests
+                const csrfToken = "<?php echo getCsrfToken(); ?>";
+                
+                // Add CSRF token to all fetch requests
+                const originalFetch = window.fetch;
+                window.fetch = function(url, options = {}) {
+                    if (options.method && (options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE')) {
+                        options.headers = options.headers || {};
+                        options.headers['X-CSRF-Token'] = csrfToken;
+                        
+                        // Add CSRF token to form data if present
+                        if (options.body instanceof FormData) {
+                            options.body.append('csrf_token', csrfToken);
+                        }
+                    }
+                    return originalFetch(url, options);
+                };
+                
                 const INVENTORY_ITEMS = <?php echo json_encode($inventory_items); ?>;
 
                 function buildItemSelect(selectedItemId) {

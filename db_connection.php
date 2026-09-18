@@ -1,12 +1,24 @@
 <?php
-ini_set('display_errors', 0);          // ← changed: don't leak PHP errors in production
-ini_set('display_startup_errors', 0);  // ← changed
+// Load environment variables from .env file
+require_once __DIR__ . '/load_env.php';
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username   = getenv('DB_USERNAME') ?: 'root';
-$password   = getenv('DB_PASSWORD') ?: '';
-$dbname     = getenv('DB_DATABASE') ?: 'supplychain';
+// Fetch environment variables - NO HARDCODED FALLBACKS
+$servername = getenv('DB_HOST');
+$username   = getenv('DB_USERNAME');
+$password   = getenv('DB_PASSWORD');
+$dbname     = getenv('DB_DATABASE');
+
+// Validate that required environment variables are set
+if (!$servername || !$username || !$dbname) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['message' => 'Database configuration incomplete. Please set DB_HOST, DB_USERNAME, DB_PASSWORD, and DB_DATABASE environment variables.']);
+    exit;
+}
 
 mysqli_report(MYSQLI_REPORT_OFF);
 $conn = @new mysqli($servername, $username, $password, $dbname);
@@ -14,22 +26,7 @@ $conn = @new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_errno) {
     http_response_code(500);
     header('Content-Type: application/json');
-
-    // Debug mode now driven by env var — OFF unless you explicitly set
-    // DEBUG_MODE=true in HostForge's environment variables.
-    $debug = getenv('DEBUG_MODE') === 'true';
-
-    if ($debug) {
-        echo json_encode([
-            'message' => 'Service temporarily unavailable.',
-            'debug_error' => $conn->connect_error,
-            'debug_errno' => $conn->connect_errno,
-            'debug_host'  => $servername,
-            'debug_db'    => $dbname
-        ]);
-    } else {
-        echo json_encode(['message' => 'Service temporarily unavailable.']);
-    }
+    echo json_encode(['message' => 'Service temporarily unavailable.']);
     exit;
 }
 

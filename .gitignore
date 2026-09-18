@@ -1,0 +1,38 @@
+# Environment Configuration
+.env
+.env.local
+.env.*.local
+
+# Database Files
+db sql/
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+
+# Cache and Optimization
+.cache/
+*.cache
+
+# Operating System Files
+Thumbs.db
+.DS_Store
+
+# Build and Distribution
+dist/
+build/
+*.min.js
+*.min.css
+
+# Backup Files
+*.bak
+*.backup

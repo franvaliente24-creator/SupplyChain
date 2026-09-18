@@ -2,3 +2,6 @@ db sql/
 .git
 .gitignore
 *.tmp
+.env
+.env.local
+.env.*.local

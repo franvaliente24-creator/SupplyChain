@@ -1,30 +1,58 @@
 <?php
 // filepath: c:\xampp\htdocs\SupplyChain\login.php
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+// Load centralized session configuration
+require_once __DIR__ . '/session_config.php';
+
+// Load CSRF protection
+require_once __DIR__ . '/csrf_config.php';
+
+// Load rate limiter
+require_once __DIR__ . '/rate_limiter.php';
+
+// Load input validation
+require_once __DIR__ . '/input_validation.php';
 
 header('Content-Type: application/json');
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
-}
 
 require 'core_connection.php'; // Include your database connection
 
 // Get the JSON data from the request
 $data = json_decode(file_get_contents('php://input'), true);
+
+// Validate CSRF token for POST requests
+$csrfToken = $data['csrf_token'] ?? '';
+if (!validateCsrfToken($csrfToken)) {
+    http_response_code(403);
+    echo json_encode(['message' => 'Invalid CSRF token. Please refresh the page and try again.']);
+    exit;
+}
+
 $email = trim($data['email'] ?? '');
 $password = $data['password'] ?? '';
 $rememberMe = isset($data['remember_me']) ? (bool)$data['remember_me'] : false;
+
+// Validate input
+$emailValidation = validateEmail($email);
+if (!$emailValidation['valid']) {
+    http_response_code(400);
+    echo json_encode(['message' => $emailValidation['error']]);
+    exit;
+}
+
+$passwordValidation = validateStringLength($password, 1, 128, 'Password');
+if (!$passwordValidation['valid']) {
+    http_response_code(400);
+    echo json_encode(['message' => $passwordValidation['error']]);
+    exit;
+}
+
+// Check rate limiting before processing login
+$rateLimitCheck = isRateLimited($email, 'login');
+if ($rateLimitCheck['limited']) {
+    http_response_code(429);
+    echo json_encode(['message' => $rateLimitCheck['message']]);
+    exit;
+}
 
 // Validate input
 if (!$email || !$password) {
@@ -62,6 +90,9 @@ $stmt->close();
 
 // Verify the password
 if (!password_verify($password, $hashedPassword)) {
+    // Record failed attempt for rate limiting
+    recordFailedAttempt($email, 'login');
+    
     // Log failed login attempt to activity log (best-effort, never fatal)
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -93,6 +124,9 @@ if (!password_verify($password, $hashedPassword)) {
 
 // Regenerate session ID to prevent session fixation
 session_regenerate_id(true);
+
+// Reset rate limit on successful login
+resetRateLimit($email, 'login');
 
 // Store user in session
 $_SESSION['user_id'] = $userId;
@@ -172,30 +206,8 @@ if ($rememberMe) {
         }
     }
 
-    setcookie(
-        'remember_token',
-        $rememberToken,
-        [
-            'expires' => $rememberExpires,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ]
-    );
-    setcookie(
-        'remember_uid',
-        (string)$userId,
-        [
-            'expires' => $rememberExpires,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ]
-    );
+    setSecureCookie('remember_token', $rememberToken, $rememberExpires);
+    setSecureCookie('remember_uid', (string)$userId, $rememberExpires);
 } else {
     if ($rememberTableExists) {
         $delStmt = $conn->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
@@ -207,8 +219,8 @@ if ($rememberMe) {
     }
 
     if (isset($_COOKIE['remember_token'])) {
-        setcookie('remember_token', '', time() - 3600, '/');
-        setcookie('remember_uid', '', time() - 3600, '/');
+        clearSecureCookie('remember_token');
+        clearSecureCookie('remember_uid');
     }
 }
 

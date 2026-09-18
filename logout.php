@@ -1,21 +1,8 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+// Load centralized session configuration
+require_once __DIR__ . '/session_config.php';
 
 header('Content-Type: application/json');
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
-}
 
 $_SESSION = [];
 
@@ -34,10 +21,8 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
-setcookie('remember_token', '', time() - 3600, '/');
-setcookie('remember_uid', '', time() - 3600, '/');
-setcookie('remember_token', '', time() - 3600, '/');
-setcookie('remember_uid', '', time() - 3600, '/');
+clearSecureCookie('remember_token');
+clearSecureCookie('remember_uid');
 
 require 'core_connection.php';
 if (!empty($_COOKIE['remember_uid'])) {

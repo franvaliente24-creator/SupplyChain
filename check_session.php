@@ -1,21 +1,8 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+// Load centralized session configuration
+require_once __DIR__ . '/session_config.php';
 
 header('Content-Type: application/json');
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    session_start();
-}
 
 require 'core_connection.php';
 
@@ -30,16 +17,10 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
     $email = $_SESSION['email'] ?? null;
     $username = $_SESSION['username'] ?? null;
     
-    // Check for session timeout (30 minutes of inactivity)
-    $session_timeout = 30 * 60; // 30 minutes in seconds
-    if (isset($_SESSION['logged_in_at']) && (time() - $_SESSION['logged_in_at']) > $session_timeout) {
-        // Session expired, clear it
-        session_unset();
-        session_destroy();
-        // Proceed to remember me check below
+    // Check for session timeout using centralized function
+    if (!checkSessionTimeout()) {
+        // Session expired, proceed to remember me check below
     } else {
-        // Update last activity time
-        $_SESSION['logged_in_at'] = time();
 
         $stmt = $conn->prepare('SELECT user_id, username, email, role, is_active FROM users WHERE user_id = ? LIMIT 1');
         $stmt->bind_param('i', $userId);
@@ -111,8 +92,8 @@ if (!$loggedIn && !empty($_COOKIE['remember_token']) && !empty($_COOKIE['remembe
         }
         $stmt->close();
     } else {
-        setcookie('remember_token', '', time() - 3600, '/');
-        setcookie('remember_uid', '', time() - 3600, '/');
+        clearSecureCookie('remember_token');
+        clearSecureCookie('remember_uid');
     }
 }
 

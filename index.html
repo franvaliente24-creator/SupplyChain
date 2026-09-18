@@ -127,6 +127,23 @@
             }
         })();
 
+        // Fetch CSRF token for login form
+        let csrfToken = '';
+        (async () => {
+            try {
+                const csrfResponse = await fetch(`${BASE}/csrf_token.php`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                if (csrfResponse.ok) {
+                    const csrfData = await csrfResponse.json();
+                    csrfToken = csrfData.csrf_token || '';
+                }
+            } catch (e) {
+                console.warn('CSRF token fetch failed:', e);
+            }
+        })();
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -174,7 +191,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ email, password, remember_me: rememberMe }),
+                    body: JSON.stringify({ email, password, remember_me: rememberMe, csrf_token: csrfToken }),
                 });
 
                 const contentType = response.headers.get('content-type') || '';
