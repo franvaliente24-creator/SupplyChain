@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const subsystemId = getSubsystemFromUrl() || 'supply-chain';
     const subsystem = getSubsystemById(subsystemId);
     const activeModuleId = getModuleFromUrl();
-
     const dashboardHeading = document.getElementById('dashboard-heading');
     const dashboardCopy = document.getElementById('dashboard-copy');
     const dashboardStatsGrid = document.getElementById('dashboard-stats-grid');
@@ -33,95 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const moduleIconMap = {
-        'Client Management Subsystem': 'groups',
-        'Applicant Registration and Profiling System': 'person_add',
-        'Recruitment and Selection Subsystem': 'search',
-        'Job Order Management Subsystem': 'assignment',
-        'Deployment and Assignment Subsystem': 'engineering',
-        'Employee Information Management System (HRIS)': 'badge',
-        'Timekeeping and Attendance System': 'schedule',
-        'Leave and Absence Management System': 'beach_access',
-        'Payroll and Compensation System': 'attach_money',
-        'Performance Management Subsystem': 'star',
-        'Training and Development Subsystem': 'school',
-        'Document and Contract Management System': 'description',
-        'Government Contribution & Compliance Subsystem': 'gavel',
-        'Benefits and Loans Management System': 'health_and_safety',
-        'Separation and Exit Clearance Subsystem': 'verified_user',
-        'Health, Safety, and Welfare Subsystem': 'safety_check',
-        'Legal and Compliance Subsystem': 'gavel',
-        'System Administration and Security Subsystem': 'admin_panel_settings',
-        'Reports, Analytics, and Dashboards System': 'insights',
-        'Asset and Equipment Issuance Tracker': 'inventory',
-        'General Ledger': 'account_balance_wallet',
-        'Accounts Payable (AP)': 'receipt_long',
-        'Accounts Receivable (AR)': 'payments',
-        'Disbursement Management': 'account_balance',
-        'Collection Management': 'currency_exchange',
-        'Budget Management': 'account_balance',
-        'Cash Management': 'account_balance_wallet',
-        'Financial Reporting & Analytics': 'insights',
-        'Tax Management': 'request_quote',
-        'Smart Warehousing System (SWS)': 'warehouse',
-        'Inventory Management System (IMS)': 'inventory_2',
-        'Procurement & Sourcing Management (PSM)': 'shopping_bag',
-        'Supplier / Vendor Management (SVM)': 'handshake',
-        'Purchase Order Management (POM)': 'receipt_long',
-        'Document Tracking & Logistics Records System (DTRS)': 'local_shipping',
-        'Fleet & Vehicle Management (FVM)': 'directions_car',
-        'Vehicle Reservation & Dispatch System (VRDS)': 'directions_bus',
-        'Driver and Trip Performance Monitoring': 'timeline',
-        'Fuel Management System': 'local_gas_station',
-        'Transport Cost Analysis & Optimization (TCAO)': 'analytics',
-        'Route Planning & Optimization': 'map',
-        'Mobile Fleet Command App': 'emoji_transportation',
-        'Facilities Reservation System': 'meeting_room',
-        'Visitor Management System': 'badge',
-        'Document Management (Archiving System)': 'folder',
-        'Records Retention & Compliance': 'folder_shared',
-        'Legal Management System': 'gavel',
-        'Contract Management': 'description',
-        'Dashboard & Data Visualization System': 'dashboard',
-        'KPI Monitoring & Performance Tracking System': 'trending_up',
-        'Predictive Analytics System': 'insights',
-        'Custom Report Generation System': 'insert_chart',
-        'Data Aggregation & Integration System': 'storage',
-        'Exportable Reports & Decision Support System': 'file_download',
-        'Lead and Client Tracking System': 'track_changes',
-        'Communication History Management': 'forum',
-        'Client Satisfaction and Survey System': 'emoji_events',
-        'Follow-up Reminder System': 'notifications',
-        'Opportunity Pipeline Visualization': 'timeline'
+        'Smart Warehousing (SWS)': 'warehouse',
+        'Inventory Management (IMS)': 'inventory_2',
+        'Procurement & Sourcing (PSM)': 'shopping_bag',
+        'Supplier / Vendor (SVM)': 'handshake',
+        'Purchase Order (POM)': 'receipt_long',
+        'Logistics & Records (DTRS)': 'local_shipping',
+        'Administration & Security': 'admin_panel_settings'
     };
 
     const getModuleIcon = moduleName => {
-        if (!moduleName) return 'apps';
         return moduleIconMap[moduleName] || 'apps';
     };
 
-    const getStatusBadge = status => {
-        const normalized = String(status || '').toLowerCase();
-        const statusMap = {
-            completed: 'status-pill status-pill-success',
-            ready: 'status-pill status-pill-success',
-            updated: 'status-pill status-pill-info',
-            pending: 'status-pill status-pill-warning',
-            scheduled: 'status-pill status-pill-info',
-            new: 'status-pill status-pill-accent'
-        };
-        return statusMap[normalized] || 'status-pill status-pill-neutral';
-    };
-
     const actionIconMap = {
-        'New Transaction': 'add',
-        'Upload Invoice': 'upload_file',
-        'Generate Report': 'insert_chart',
-        'Budget Planning': 'query_stats',
-        'Tax Filing': 'receipt_long',
-        'Approve invoices': 'task_alt',
-        'Create budget plan': 'account_balance',
-        'Review cash forecast': 'analytics',
-        'Export financial statements': 'file_download'
+        'Approve purchase orders': 'task_alt',
+        'Review supplier ratings': 'star',
+        'Update inventory counts': 'inventory_2',
+        'Track outstanding shipments': 'local_shipping'
     };
 
     const renderLineChart = dataPoints => {
@@ -132,10 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 y: 150 - value
             };
         });
-
         const linePath = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
         const fillPath = `${linePath} L ${points[points.length - 1].x} 150 L ${points[0].x} 150 Z`;
-
         return `
             <div class="dashboard-line-chart">
                 <svg viewBox="0 0 320 180" aria-hidden="true">
@@ -156,95 +82,44 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderDonutChart = segments => {
-        const gradient = segments.map((segment, index) => `${segment.color} ${index === 0 ? '0%' : ''} ${segments.slice(0, index + 1).reduce((acc, item) => acc + parseInt(item.value, 10), 0)}%`).join(', ');
         return `
-            <div class="donut-chart" style="background: conic-gradient(${segments.map(segment => `${segment.color} ${segment.value}`).join(', ')});"></div>
+            <div class="donut-chart" style="background: conic-gradient(${segments.map(segment => `${segment.color}${segment.value}`).join(', ')});"></div>
         `;
     };
-
-    if (!subsystem) {
-        dashboardHeading.textContent = 'Welcome back, Admin';
-        dashboardCopy.textContent = 'Open the module selector and choose a subsystem to view its dedicated dashboard.';
-        if (breadcrumbCategory) breadcrumbCategory.textContent = 'No subsystem selected';
-        dashboardStatsGrid.innerHTML = '';
-        dashboardCharts.innerHTML = '';
-        dashboardQuickActionsList.innerHTML = '<p class="text-sm text-on-surface-variant">Select a subsystem from the module selector to display statistics, charts, and activity.</p>';
-        dashboardActivityBody.innerHTML = '<tr><td class="px-6 py-4 text-on-surface-variant" colspan="4">No activity available. Select a subsystem to view activity logs.</td></tr>';
-        sidebarBrandTitle.textContent = 'No subsystem selected';
-        sidebarBrandCategory.textContent = 'Choose a subsystem from the selector.';
-        sidebarSubsystemModulesNav.innerHTML = '';
-        sidebarSubsystemNavPanel.classList.add('hidden');
-        return;
-    }
 
     document.title = `${subsystem.title} — Dashboard`;
     dashboardHeading.textContent = 'Welcome back, Admin';
     dashboardCopy.textContent = `Here's what's happening in ${subsystem.title} today.`;
     if (breadcrumbCategory) breadcrumbCategory.textContent = subsystem.title;
-    sidebarBrandTitle.textContent = subsystem.title;
-    sidebarBrandCategory.textContent = subsystem.category;
+    sidebarBrandTitle.textContent = 'Supply Chain';
+    sidebarBrandCategory.textContent = 'Management Console';
+
+    // Build sidebar using the exact matching styles as sidebar.php
     sidebarSubsystemModulesNav.innerHTML = subsystem.modules.map((module) => {
         const mod = normalizeModule(module);
-        const isActive = activeModuleId === mod.id;
-        const hasSubnav = mod.subnav && mod.subnav.length > 0;
-        
-        if (hasSubnav) {
-            // Module with submenu
-            const isModuleOpen = isActive;
-            const defaultViewId = mod.subnav[0]?.id;
-            const defaultRender = mod.subnav[0]?.render;
-            
-            return `
-                <div class="sidebar-module-group ${isModuleOpen ? 'open' : ''}" data-module-id="${mod.id}">
-                    <button type="button" class="sidebar-subsystem-link sidebar-module-toggle ${isActive ? 'active' : ''}" data-module="${mod.id}" data-default-render="${defaultRender}">
-                        <span class="sidebar-subsystem-link-icon">
-                            <span class="material-symbols-outlined">${getModuleIcon(mod.name)}</span>
-                        </span>
-                        <span class="truncate flex-1 text-left">${mod.name}</span>
-                        <span class="material-symbols-outlined sidebar-chevron text-base">expand_more</span>
-                    </button>
-                    <div class="sidebar-submenu" data-submenu-for="${mod.id}">
-                        ${mod.subnav.map(sub => {
-                            const isSubActive = sub.id === defaultViewId;
-                            // Real PHP-backed pages (SWS, IMS, PSM, SVM, POM, DTRS) declare
-                            // an `href` in subsystems.js — navigate straight there.
-                            // Mock/demo subsystems declare a `render` function name instead
-                            // and get rendered client-side inside module.html.
-                            if (sub.href) {
-                                return `
-                                    <a href="${sub.href}"
-                                       class="sidebar-submenu-link ${isSubActive ? 'active' : ''}"
-                                       data-view="${sub.id}">
-                                        <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
-                                        <span class="truncate">${sub.label}</span>
-                                    </a>
-                                `;
-                            }
-                            return `
-                                <a href="#"
-                                   class="sidebar-submenu-link ${isSubActive ? 'active' : ''}" 
-                                   data-view="${sub.id}"
-                                   data-render="${sub.render}">
-                                    <span class="material-symbols-outlined sidebar-submenu-icon">${sub.icon}</span>
-                                    <span class="truncate">${sub.label}</span>
-                                </a>
-                            `;
-                        }).join('')}
-                    </div>
+        return `
+            <div class="sidebar-module-group" data-module-id="${mod.id}">
+                <button type="button" class="sidebar-module-toggle w-full flex items-center justify-between px-3 py-2 rounded-xl border border-transparent text-slate-700 hover:bg-slate-100 font-medium text-xs transition">
+                    <span class="flex items-center gap-2.5 truncate">
+                        <span class="material-symbols-outlined text-[18px] text-indigo-600">${mod.icon || getModuleIcon(mod.name)}</span>
+                        <span class="truncate">${mod.name}</span>
+                    </span>
+                    <span class="material-symbols-outlined sidebar-chevron text-[16px] text-slate-400 transition-transform duration-200">expand_more</span>
+                </button>
+                <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="max-height: 0px; display: none;">
+                    ${mod.subnav.map(sub => `
+                        <a href="${sub.href}" class="sidebar-submenu-link flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+                            <span class="material-symbols-outlined sidebar-submenu-icon text-[16px] text-slate-400">${sub.icon}</span>
+                            <span class="truncate">${sub.label}</span>
+                        </a>
+                    `).join('')}
                 </div>
-            `;
-        } else {
-            // Plain module link (no submenu)
-            return `
-                <a href="${getModuleHref(subsystemId, mod.id)}" class="sidebar-subsystem-link ${isActive ? 'active' : ''}">
-                    <span class="material-symbols-outlined sidebar-subsystem-link-icon">${getModuleIcon(mod.name)}</span>
-                    <span class="truncate">${mod.name}</span>
-                </a>
-            `;
-        }
+            </div>
+        `;
     }).join('');
     sidebarSubsystemNavPanel.classList.remove('hidden');
 
+    // Render Critical Alerts
     const criticalAlertsContainer = document.getElementById('dashboard-critical-alerts');
     if (criticalAlertsContainer && subsystem.criticalAlerts && subsystem.criticalAlerts.length > 0) {
         criticalAlertsContainer.classList.remove('hidden');
@@ -263,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${alert.items.slice(0, 2).map(item => `
                                         <p class="text-xs ${alert.severity === 'high' ? 'text-red-600' : 'text-amber-600'} truncate">${item}</p>
                                     `).join('')}
-                                    ${alert.items.length > 2 ? `<p class="text-xs ${alert.severity === 'high' ? 'text-red-600' : 'text-amber-600'}">+${alert.items.length - 2} more</p>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -271,23 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('')}
             </div>
         `;
-    } else if (criticalAlertsContainer) {
-        criticalAlertsContainer.classList.add('hidden');
     }
 
+    // Render Stats Grid
     dashboardStatsGrid.innerHTML = subsystem.stats.map(stat => {
-        const deltaMap = {
-            'Pipeline Value': { text: '+12.4% vs last month', isPositive: true },
-            'Open Requests': { text: '+8.6% vs last week', isPositive: true },
-            'Active Clients': { text: '+3.2% vs last quarter', isPositive: true },
-            'Fill Rate': { text: '+4.5% vs target', isPositive: true }
-        };
-        const defaultDelta = stat.tone === 'positive'
+        const delta = stat.tone === 'positive'
             ? { text: '+12% vs last month', isPositive: true }
             : stat.tone === 'caution'
             ? { text: '-2.4% vs last month', isPositive: false }
             : { text: '+1.8% vs last month', isPositive: true };
-        const delta = stat.delta || deltaMap[stat.label] || defaultDelta;
 
         const renderSparkline = (trend) => {
             if (!trend || !Array.isArray(trend) || trend.length < 2) return '';
@@ -299,21 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const y = 100 - ((val - min) / range) * 80;
                 return `${x},${y}`;
             }).join(' ');
-            const isPositive = trend[trend.length - 1] >= trend[0];
             return `
                 <svg class="w-16 h-8" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <polyline
-                        fill="none"
-                        stroke="${isPositive ? '#10b981' : '#ef4444'}"
-                        stroke-width="2"
-                        points="${points}"
-                    />
+                    <polyline fill="none" stroke="${delta.isPositive ? '#10b981' : '#ef4444'}" stroke-width="2" points="${points}" />
                 </svg>
             `;
         };
 
         return `
-            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between gap-4 overflow-hidden relative cursor-pointer hover:shadow-md hover:border-slate-300 transition-all metric-card" data-metric="${stat.label}">
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between gap-4 overflow-hidden relative metric-card cursor-pointer hover:shadow-md transition-all" data-metric="${stat.label}">
                 <div class="flex items-center justify-between gap-3">
                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">${stat.label}</p>
                     <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -334,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }).join('');
 
+    // Quick Actions
     dashboardQuickActionsList.innerHTML = subsystem.quickActions.map(action => `
         <button type="button" class="quick-action-button" data-action="${action}">
             <span class="flex items-center gap-3">
@@ -344,10 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
         </button>
     `).join('');
 
+    // Analytics Overview
     const renderAnalytics = analytics => {
         const overviewTitle = analytics?.overviewTitle || 'Performance overview';
         const overviewMetric = analytics?.overviewMetric || subsystem.stats[0]?.value || 'Overview';
-        const overviewSubtitle = analytics?.overviewSubtitle || subsystem.description || `Track ${subsystem.title} performance.`;
+        const overviewSubtitle = analytics?.overviewSubtitle || subsystem.description || '';
         const overviewTrend = analytics?.overviewTrend || 'Updated now';
         const overviewData = Array.isArray(analytics?.overviewData) && analytics.overviewData.length
             ? analytics.overviewData
@@ -413,9 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     };
-
     renderAnalytics(subsystem.analytics);
 
+    // Recent Activity Table
     dashboardActivityBody.innerHTML = subsystem.activity.map(item => `
         <tr class="hover:bg-surface-container-lowest transition-colors activity-row" data-category="${item.category || 'All'}">
             <td class="px-6 py-4 text-sm text-on-surface">${item.label}</td>
@@ -429,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </tr>
     `).join('');
 
-    // Activity filter functionality
+    // Activity Filter Buttons
     const filterButtons = document.querySelectorAll('.activity-filter-btn');
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -439,59 +301,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             btn.classList.add('active', 'bg-surface', 'text-on-surface', 'shadow-sm');
             btn.classList.remove('text-on-surface-variant');
-
             const filter = btn.dataset.filter;
-            const rows = document.querySelectorAll('.activity-row');
-            rows.forEach(row => {
-                if (filter === 'all' || row.dataset.category === filter) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            document.querySelectorAll('.activity-row').forEach(row => {
+                row.style.display = (filter === 'all' || row.dataset.category === filter) ? '' : 'none';
             });
         });
     });
 
-    // Initialize first filter button as active
-    if (filterButtons.length > 0) {
-        filterButtons[0].classList.add('bg-surface', 'text-on-surface', 'shadow-sm');
-        filterButtons[0].classList.remove('text-on-surface-variant');
-    }
-
-    // Quick action modal functionality
-    const quickActionButtons = document.querySelectorAll('.quick-action-button');
-    quickActionButtons.forEach(btn => {
+    // Quick Action Trigger
+    document.querySelectorAll('.quick-action-button').forEach(btn => {
         btn.addEventListener('click', () => {
-            const action = btn.dataset.action;
-            openQuickActionModal(action);
+            openQuickActionModal(btn.dataset.action);
         });
     });
 
-    // Metric card click functionality
-    const metricCards = document.querySelectorAll('.metric-card');
-    metricCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const metric = card.dataset.metric;
-            console.log('Drill down into metric:', metric);
-            confirmDashboardAction(null, `Opening detailed report for ${metric}...`);
-        });
-    });
-
-    // Time range selector functionality
-    const timeRangeSelector = document.getElementById('time-range-selector');
-    if (timeRangeSelector) {
-        timeRangeSelector.addEventListener('change', () => {
-            const range = timeRangeSelector.value;
-            console.log('Time range changed to:', range);
-            confirmDashboardAction(null, `Updated dashboard to show last ${range} days`);
-        });
-    }
-
-    // Sidebar navigation handling
-    initSidebarNavigation();
+    // Sidebar Accordion Handler (Pure Toggle — No automatic navigation to firstHref)
     initSidebarSubmenus();
 
-    // Sidebar collapse functionality
+    // Responsive Desktop Collapse Toggle
     const sidebarToggle = document.getElementById('desktop-sidebar-toggle');
     const sidebar = document.getElementById('app-sidebar');
     const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
@@ -500,176 +327,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarToggle && sidebar && sidebarToggleIcon) {
         sidebarToggle.addEventListener('click', () => {
             isCollapsed = !isCollapsed;
-            if (isCollapsed) {
-                sidebar.classList.add('w-20');
-                sidebar.classList.remove('w-72');
-                sidebar.style.width = '';
-                sidebarToggleIcon.textContent = 'menu';
-                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.add('hidden'));
-            } else {
-                sidebar.classList.remove('w-20');
-                sidebar.classList.add('w-72');
-                sidebar.style.width = '';
-                sidebarToggleIcon.textContent = 'menu_open';
-                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.remove('hidden'));
-            }
-        });
-    }
-
-    // Sidebar resize functionality
-    const resizeHandle = document.getElementById('sidebar-resize-handle');
-    if (resizeHandle && sidebar) {
-        let isResizing = false;
-        let startX, startWidth;
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            startX = e.clientX;
-            startWidth = sidebar.offsetWidth;
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
-            const diff = e.clientX - startX;
-            const newWidth = Math.max(200, Math.min(500, startWidth + diff));
-            sidebar.style.width = newWidth + 'px';
-            
-            // Update collapsed state
-            if (newWidth <= 100) {
-                isCollapsed = true;
-                sidebar.classList.add('w-20');
-                sidebar.classList.remove('w-72');
-                sidebarToggleIcon.textContent = 'menu';
-                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.add('hidden'));
-            } else {
-                isCollapsed = false;
-                sidebar.classList.remove('w-20');
-                sidebar.classList.remove('w-72');
-                sidebarToggleIcon.textContent = 'menu_open';
-                document.querySelectorAll('.sidebar-subsystem-link span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('#sidebar-brand-title, #sidebar-brand-category').forEach(el => el.classList.remove('hidden'));
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            isResizing = false;
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
+            sidebar.classList.toggle('w-20', isCollapsed);
+            sidebar.classList.toggle('w-72', !isCollapsed);
+            sidebarToggleIcon.textContent = isCollapsed ? 'menu' : 'menu_open';
+            document.querySelectorAll('.sidebar-module-toggle span:not(.material-symbols-outlined), .sidebar-chevron, .sidebar-submenu').forEach(el => {
+                el.classList.toggle('hidden', isCollapsed);
+            });
         });
     }
 });
 
 function initSidebarSubmenus() {
-    // Handle module toggle clicks (accordion behavior + navigate to module)
-    document.querySelectorAll('.sidebar-module-toggle').forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
+    document.querySelectorAll('.sidebar-module-toggle').forEach(btn => {
+        btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const group = toggle.closest('.sidebar-module-group');
-            const moduleId = toggle.dataset.module;
-            
-            // Toggle accordion
-            if (group) {
-                group.classList.toggle('open');
-            }
+            const parentGroup = btn.closest('.sidebar-module-group');
+            if (!parentGroup) return;
 
-            const firstSubmenuLink = group ? group.querySelector('.sidebar-submenu-link') : null;
-            const firstHref = firstSubmenuLink ? firstSubmenuLink.getAttribute('href') : null;
+            const isOpen = parentGroup.classList.toggle('open');
+            const chevron = btn.querySelector('.sidebar-chevron');
+            const submenu = parentGroup.querySelector('.sidebar-submenu');
 
-            // Real PHP-backed module (SWS, IMS, PSM, SVM, POM, DTRS): the first
-            // submenu item points straight at its real page — go there directly.
-            if (firstHref && firstHref !== '#') {
-                window.location.href = firstHref;
-                return;
-            }
-
-            // Mock/demo subsystem: fall back to the client-rendered module.html shell.
-            const subsystemId = getSubsystemFromUrl() || 'supply-chain';
-            const defaultViewId = firstSubmenuLink ? firstSubmenuLink.dataset.view : null;
-            const moduleHref = `module.html?subsystem=${encodeURIComponent(subsystemId)}&module=${encodeURIComponent(moduleId)}`;
-            window.location.href = moduleHref + (defaultViewId ? `&view=${defaultViewId}` : '');
-        });
-    });
-
-    // Handle submenu link clicks
-    document.querySelectorAll('.sidebar-submenu-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const href = link.getAttribute('href');
-
-            // Real page link — let the browser navigate normally.
-            if (href && href !== '#') {
-                return;
-            }
-
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Update active state for all submenu items in the same group
-            const submenu = link.closest('.sidebar-submenu');
             if (submenu) {
-                submenu.querySelectorAll('.sidebar-submenu-link').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
+                submenu.style.display = isOpen ? 'block' : 'none';
+                submenu.style.maxHeight = isOpen ? '500px' : '0px';
+                if (chevron) {
+                    chevron.classList.toggle('rotate-180', isOpen);
+                }
             }
-
-            // Get render function from data attribute and call it
-            const renderFunc = link.dataset.render;
-            if (renderFunc && window[renderFunc]) {
-                // Update URL without full page reload
-                const url = new URL(window.location);
-                url.searchParams.set('view', link.dataset.view);
-                window.history.pushState({}, '', url);
-                
-                // Call the render function
-                window[renderFunc]();
-            }
-        });
-    });
-}
-
-function initSidebarNavigation() {
-    // Handle sidebar link clicks for in-page navigation
-    const handleSidebarClick = (e) => {
-        const link = e.target.closest('a');
-        if (!link) return;
-
-        // Allow ctrl/cmd/middle-click for opening in new tab
-        if (e.ctrlKey || e.metaKey || e.button === 1) return;
-
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        // Check if this is a submenu link (sub-view navigation within same module)
-        const isSubmenuLink = link.classList.contains('sidebar-submenu-link');
-        
-        // For submenu links, let the submenu click handler in initSidebarSubmenus handle this
-        if (isSubmenuLink) {
-            return;
-        }
-
-        // For all other links, let the default anchor behavior handle navigation
-        // This ensures proper module switching and dashboard navigation
-        return;
-    };
-
-    // Attach to sidebar navigation container
-    const sidebarNav = document.querySelector('.sidebar-subsystem-modules');
-    if (sidebarNav) {
-        sidebarNav.addEventListener('click', handleSidebarClick);
-    }
-
-    // Attach to dashboard link
-    const dashboardLink = document.getElementById('sidebar-dashboard-link');
-    if (dashboardLink) {
-        dashboardLink.addEventListener('click', handleSidebarClick);
-    }
-
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', () => {
-        location.reload();
+        };
     });
 }

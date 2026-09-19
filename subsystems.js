@@ -33,39 +33,45 @@ const subsystemsData = {
       // 1. Smart Warehousing System (SWS)
       {
         id: 'smart-warehousing-system',
-        name: 'Smart Warehousing System (SWS)',
+        name: 'Smart Warehousing (SWS)',
         icon: 'warehouse',
         subnav: [
+          { id: 'warehouse-overview', label: 'Warehouse Overview', icon: 'warehouse', href: 'warehouse.php' },
           { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', href: 'zone_map.php' },
-          { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', href: 'bin_lookup.php' },
+          { id: 'bin-lookup', label: 'Bin Location Lookup', icon: 'search', href: 'bin_lookup.php' },
           { id: 'task-queues', label: 'Task Queues', icon: 'assignment', href: 'task_queues.php' },
-          { id: 'cycle-count', label: 'Cycle Count', icon: 'checklist', href: 'cycle_count.php' }
+          { id: 'cycle-count', label: 'Cycle Count & Audit', icon: 'checklist', href: 'cycle_count.php' },
+          { id: 'tech-assets', label: 'Tech Assets & Hardware', icon: 'devices', href: 'tech_assets.php' },
+          { id: 'asset-assignments', label: 'Equipment Matching', icon: 'assignment_ind', href: 'asset_assignments.php' }
         ]
       },
 
       // 2. Inventory Management System (IMS)
       {
         id: 'inventory-management-system',
-        name: 'Inventory Management System (IMS)',
+        name: 'Inventory Management (IMS)',
         icon: 'inventory_2',
         subnav: [
-          { id: 'item-master', label: 'Item Master', icon: 'inventory_2', href: 'item_master.php' },
-          { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', href: 'stock_levels.php' },
+          { id: 'item-master', label: 'Item Master Directory', icon: 'inventory_2', href: 'item_master.php' },
+          { id: 'stock-levels', label: 'Stock Level Tracker', icon: 'bar_chart', href: 'stock_levels.php' },
+          { id: 'stock-requisitions', label: 'Stock Requisitions', icon: 'swap_horiz', href: 'stock_requisitions.php' },
           { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', href: 'utilization_overview.php' },
-          { id: 'adjustments', label: 'Adjustments', icon: 'tune', href: 'adjustments.php' },
-          { id: 'asset-disposition', label: 'Asset Disposition', icon: 'swap_horiz', href: 'asset_disposition.php' }
+          { id: 'adjustments', label: 'Stock Adjustments', icon: 'tune', href: 'adjustments.php' },
+          { id: 'asset-disposition', label: 'Asset Disposition', icon: 'delete_sweep', href: 'asset_disposition.php' }
         ]
       },
 
       // 3. Procurement & Sourcing Management (PSM)
       {
         id: 'procurement-sourcing-management',
-        name: 'Procurement & Sourcing Management (PSM)',
+        name: 'Procurement & Sourcing (PSM)',
         icon: 'shopping_bag',
         subnav: [
-          { id: 'requisitions', label: 'Requisitions', icon: 'description', href: 'requisitions.php' },
-          { id: 'rfqs', label: 'RFQs', icon: 'request_quote', href: 'rfqs.php' },
-          { id: 'sourcing', label: 'Sourcing', icon: 'handshake', href: 'sourcing.php' },
+          { id: 'requisitions', label: 'Material Requisitions', icon: 'description', href: 'requisitions.php' },
+          { id: 'rfqs', label: 'RFQ Management', icon: 'request_quote', href: 'rfqs.php' },
+          { id: 'rfp-management', label: 'RFP Management', icon: 'contract', href: 'rfp_management.php' },
+          { id: 'sourcing', label: 'Supplier Sourcing', icon: 'handshake', href: 'sourcing.php' },
+          { id: 'procurement-templates', label: 'Document Templates', icon: 'file_copy', href: 'procurement_templates.php' },
           { id: 'spend', label: 'Spend Analysis', icon: 'payments', href: 'spend.php' }
         ]
       },
@@ -73,7 +79,7 @@ const subsystemsData = {
       // 4. Supplier / Vendor Management (SVM)
       {
         id: 'supplier-vendor-management',
-        name: 'Supplier / Vendor Management',
+        name: 'Supplier / Vendor (SVM)',
         icon: 'handshake',
         subnav: [
           { id: 'vendor-directory', label: 'Vendor Directory', icon: 'contacts', href: 'suppliers.php' },
@@ -88,7 +94,7 @@ const subsystemsData = {
       // 5. Purchase Order Management (POM)
       {
         id: 'purchase-order-management',
-        name: 'Purchase Order Management',
+        name: 'Purchase Order (POM)',
         icon: 'receipt_long',
         subnav: [
           { id: 'active-pos', label: 'Active Purchase Orders', icon: 'receipt_long', href: 'orders.php' },
@@ -102,15 +108,27 @@ const subsystemsData = {
       // 6. Document Tracking & Logistics Records System (DTRS)
       {
         id: 'document-tracking-logistics',
-        name: 'Document Tracking & Logistics (DTRS)',
+        name: 'Logistics & Records (DTRS)',
         icon: 'local_shipping',
         subnav: [
-          { id: 'shipping-manifests', label: 'Shipment Manifests & Tracking', icon: 'local_shipping', href: 'dtrs.php' },
-          { id: 'delivery-confirmation', label: 'Delivery Confirmation (POD)', icon: 'assignment_turned_in', href: 'pod.php' },
+          { id: 'shipping-manifests', label: 'Shipment Manifests', icon: 'local_shipping', href: 'dtrs.php' },
+          { id: 'delivery-confirmation', label: 'Proof of Delivery (POD)', icon: 'assignment_turned_in', href: 'pod.php' },
           { id: 'document-repository', label: 'Document Repository', icon: 'folder_open', href: 'document_repository.php' },
           { id: 'track-documents', label: 'Track Documents', icon: 'markunread_mailbox', href: 'document_tracking.php' },
           { id: 'carrier-directory', label: 'Carrier / 3PL Directory', icon: 'commute', href: 'carriers.php' },
-          { id: 'customs-records', label: 'Customs & Compliance Records', icon: 'gavel', href: 'customs_records.php' }
+          { id: 'customs-records', label: 'Customs & Compliance', icon: 'gavel', href: 'customs_records.php' }
+        ]
+      },
+
+      // 7. System Administration & Security
+      {
+        id: 'system-administration',
+        name: 'Administration & Security',
+        icon: 'admin_panel_settings',
+        subnav: [
+          { id: 'user-management', label: 'User Management', icon: 'manage_accounts', href: 'user_management.php' },
+          { id: 'login-history', label: 'Login History', icon: 'shield', href: 'login_history.php' },
+          { id: 'activity-log', label: 'Activity Audit Trail', icon: 'history', href: 'activity_log.php' }
         ]
       }
     ],
@@ -162,16 +180,6 @@ function getSubsystemById(id) {
   return subsystemsData[id] || subsystemsData['supply-chain'];
 }
 
-function getModuleById(subsystemId, moduleId) {
-  const subsystem = getSubsystemById(subsystemId);
-
-  if (!subsystem || !Array.isArray(subsystem.modules)) {
-    return null;
-  }
-
-  return subsystem.modules.find(mod => mod.id === moduleId) || null;
-}
-
 function normalizeModule(mod) {
   return {
     id: mod.id || '',
@@ -188,5 +196,3 @@ function getDashboardHref(subsystemId) {
 function getModuleHref(subsystemId, moduleId) {
   return `module.html?subsystem=${encodeURIComponent(subsystemId || 'supply-chain')}&module=${encodeURIComponent(moduleId)}`;
 }
-
-window.subsystemsData = subsystemsData;
