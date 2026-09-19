@@ -41,12 +41,21 @@ if (session_status() === PHP_SESSION_NONE) {
 // Function to check session timeout
 function checkSessionTimeout() {
     $sessionTimeout = (int)(getenv('SESSION_TIMEOUT') ?: '1800');
-    if (isset($_SESSION['logged_in_at']) && (time() - $_SESSION['logged_in_at']) > $sessionTimeout) {
+    
+    // Initialize session timestamp if not set
+    if (!isset($_SESSION['logged_in_at'])) {
+        $_SESSION['logged_in_at'] = time();
+        return true;
+    }
+    
+    // Check if session has expired
+    if ((time() - $_SESSION['logged_in_at']) > $sessionTimeout) {
         // Session expired
         session_unset();
         session_destroy();
         return false;
     }
+    
     // Update last activity time
     $_SESSION['logged_in_at'] = time();
     return true;

@@ -53,10 +53,30 @@ if (count($header_name_parts) > 1 && $header_name_parts[0] !== '' && $header_nam
                 <span class="material-symbols-outlined text-lg text-on-surface-variant">person</span>
                 <span class="font-medium">My Profile</span>
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors">
-                <span class="material-symbols-outlined text-lg text-on-surface-variant">manage_accounts</span>
-                <span class="font-medium">Settings</span>
-            </a>
+            <div class="relative">
+                <button type="button" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors w-full text-left" onclick="document.getElementById('settings-submenu').classList.toggle('hidden')">
+                    <span class="material-symbols-outlined text-lg text-on-surface-variant">manage_accounts</span>
+                    <span class="font-medium">Settings</span>
+                    <span class="material-symbols-outlined text-sm ml-auto">expand_more</span>
+                </button>
+                <div id="settings-submenu" class="hidden absolute right-0 top-full mt-1 w-56 bg-surface rounded-xl shadow-xl border border-outline-variant/30 py-2 z-50">
+                    <div class="px-4 py-2">
+                        <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">Administration</p>
+                    </div>
+                    <a href="user_management.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-lg text-on-surface-variant">admin_panel_settings</span>
+                        <span class="font-medium">User Management</span>
+                    </a>
+                    <a href="activity_log.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-lg text-on-surface-variant">history</span>
+                        <span class="font-medium">Activity Log</span>
+                    </a>
+                    <a href="login_history.php" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-lg text-on-surface-variant">security</span>
+                        <span class="font-medium">Login History</span>
+                    </a>
+                </div>
+            </div>
             <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors">
                 <span class="material-symbols-outlined text-lg text-on-surface-variant">notifications</span>
                 <span class="font-medium">Notifications</span>
@@ -156,6 +176,23 @@ if (count($header_name_parts) > 1 && $header_name_parts[0] !== '' && $header_nam
                     closeDashboardModal(modal.id);
                 }
             });
+            // Close settings submenu
+            const settingsSubmenu = document.getElementById('settings-submenu');
+            if (settingsSubmenu && !settingsSubmenu.classList.contains('hidden')) {
+                settingsSubmenu.classList.add('hidden');
+            }
+        }
+    });
+
+    // Settings submenu functionality
+    document.addEventListener('click', (e) => {
+        const settingsSubmenu = document.getElementById('settings-submenu');
+        const settingsButton = e.target.closest('button[onclick*="settings-submenu"]');
+        
+        if (settingsSubmenu && !settingsSubmenu.classList.contains('hidden')) {
+            if (!settingsSubmenu.contains(e.target) && !settingsButton) {
+                settingsSubmenu.classList.add('hidden');
+            }
         }
     });
 </script>
