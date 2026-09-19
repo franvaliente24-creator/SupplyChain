@@ -1,5 +1,5 @@
 <?php
-// sidebar.php - Synchronized Enterprise Navigation
+// sidebar.php - Synchronized Complete Navigation Component
 $current_page = basename($_SERVER['PHP_SELF']);
 
 $nav_groups = [
@@ -131,7 +131,7 @@ $nav_groups = [
                         <span class="material-symbols-outlined sidebar-chevron text-[16px] text-slate-400 transition-transform duration-200 <?php echo $is_open ? 'rotate-180' : ''; ?>">expand_more</span>
                     </button>
 
-                    <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="<?php echo $is_open ? 'max-height: 500px;' : 'max-height: 0px;'; ?>">
+                    <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="<?php echo $is_open ? 'max-height: 500px; display: block;' : 'max-height: 0px; display: none;'; ?>">
                         <?php foreach ($group['children'] as $child): 
                             $is_active = ($current_page === $child['href']);
                         ?>
@@ -149,7 +149,6 @@ $nav_groups = [
 </aside>
 
 <script>
-// Scoped sidebar accordion logic
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.sidebar-module-toggle').forEach(btn => {
         btn.onclick = (e) => {
@@ -163,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const submenu = parentGroup.querySelector('.sidebar-submenu');
             
             if (submenu) {
+                submenu.style.display = isOpen ? 'block' : 'none';
                 submenu.style.maxHeight = isOpen ? '500px' : '0px';
                 if (chevron) {
                     chevron.classList.toggle('rotate-180', isOpen);

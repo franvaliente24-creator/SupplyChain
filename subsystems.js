@@ -1,4 +1,3 @@
-
 /**
  * subsystems.js - Centralized Module & Navigation Registry
  */
@@ -34,15 +33,15 @@ const subsystemsData = {
       // 1. Smart Warehousing System (SWS)
       {
         id: 'smart-warehousing-system',
-        name: 'Smart Warehousing System (SWS)',
+        name: 'Smart Warehousing (SWS)',
         icon: 'warehouse',
         subnav: [
           { id: 'warehouse-overview', label: 'Warehouse Overview', icon: 'warehouse', href: 'warehouse.php' },
           { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', href: 'zone_map.php' },
-          { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', href: 'bin_lookup.php' },
+          { id: 'bin-lookup', label: 'Bin Location Lookup', icon: 'search', href: 'bin_lookup.php' },
           { id: 'task-queues', label: 'Task Queues', icon: 'assignment', href: 'task_queues.php' },
-          { id: 'cycle-count', label: 'Cycle Count', icon: 'checklist', href: 'cycle_count.php' },
-          { id: 'tech-assets', label: 'Tech Assets', icon: 'devices', href: 'tech_assets.php' },
+          { id: 'cycle-count', label: 'Cycle Count & Audit', icon: 'checklist', href: 'cycle_count.php' },
+          { id: 'tech-assets', label: 'Tech Assets & Hardware', icon: 'devices', href: 'tech_assets.php' },
           { id: 'asset-assignments', label: 'Equipment Matching', icon: 'assignment_ind', href: 'asset_assignments.php' }
         ]
       },
@@ -50,14 +49,14 @@ const subsystemsData = {
       // 2. Inventory Management System (IMS)
       {
         id: 'inventory-management-system',
-        name: 'Inventory Management System (IMS)',
+        name: 'Inventory Management (IMS)',
         icon: 'inventory_2',
         subnav: [
-          { id: 'item-master', label: 'Item Master', icon: 'inventory_2', href: 'item_master.php' },
-          { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', href: 'stock_levels.php' },
+          { id: 'item-master', label: 'Item Master Directory', icon: 'inventory_2', href: 'item_master.php' },
+          { id: 'stock-levels', label: 'Stock Level Tracker', icon: 'bar_chart', href: 'stock_levels.php' },
           { id: 'stock-requisitions', label: 'Stock Requisitions', icon: 'swap_horiz', href: 'stock_requisitions.php' },
           { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', href: 'utilization_overview.php' },
-          { id: 'adjustments', label: 'Adjustments', icon: 'tune', href: 'adjustments.php' },
+          { id: 'adjustments', label: 'Stock Adjustments', icon: 'tune', href: 'adjustments.php' },
           { id: 'asset-disposition', label: 'Asset Disposition', icon: 'delete_sweep', href: 'asset_disposition.php' }
         ]
       },
@@ -65,13 +64,13 @@ const subsystemsData = {
       // 3. Procurement & Sourcing Management (PSM)
       {
         id: 'procurement-sourcing-management',
-        name: 'Procurement & Sourcing Management (PSM)',
+        name: 'Procurement & Sourcing (PSM)',
         icon: 'shopping_bag',
         subnav: [
-          { id: 'requisitions', label: 'Requisitions', icon: 'description', href: 'requisitions.php' },
-          { id: 'rfqs', label: 'RFQs', icon: 'request_quote', href: 'rfqs.php' },
+          { id: 'requisitions', label: 'Material Requisitions', icon: 'description', href: 'requisitions.php' },
+          { id: 'rfqs', label: 'RFQ Management', icon: 'request_quote', href: 'rfqs.php' },
           { id: 'rfp-management', label: 'RFP Management', icon: 'contract', href: 'rfp_management.php' },
-          { id: 'sourcing', label: 'Sourcing', icon: 'handshake', href: 'sourcing.php' },
+          { id: 'sourcing', label: 'Supplier Sourcing', icon: 'handshake', href: 'sourcing.php' },
           { id: 'procurement-templates', label: 'Document Templates', icon: 'file_copy', href: 'procurement_templates.php' },
           { id: 'spend', label: 'Spend Analysis', icon: 'payments', href: 'spend.php' }
         ]
@@ -80,7 +79,7 @@ const subsystemsData = {
       // 4. Supplier / Vendor Management (SVM)
       {
         id: 'supplier-vendor-management',
-        name: 'Supplier / Vendor Management',
+        name: 'Supplier / Vendor (SVM)',
         icon: 'handshake',
         subnav: [
           { id: 'vendor-directory', label: 'Vendor Directory', icon: 'contacts', href: 'suppliers.php' },
@@ -95,7 +94,7 @@ const subsystemsData = {
       // 5. Purchase Order Management (POM)
       {
         id: 'purchase-order-management',
-        name: 'Purchase Order Management',
+        name: 'Purchase Order (POM)',
         icon: 'receipt_long',
         subnav: [
           { id: 'active-pos', label: 'Active Purchase Orders', icon: 'receipt_long', href: 'orders.php' },
@@ -109,15 +108,15 @@ const subsystemsData = {
       // 6. Document Tracking & Logistics Records System (DTRS)
       {
         id: 'document-tracking-logistics',
-        name: 'Document Tracking & Logistics (DTRS)',
+        name: 'Logistics & Records (DTRS)',
         icon: 'local_shipping',
         subnav: [
-          { id: 'shipping-manifests', label: 'Shipment Manifests & Tracking', icon: 'local_shipping', href: 'dtrs.php' },
-          { id: 'delivery-confirmation', label: 'Delivery Confirmation (POD)', icon: 'assignment_turned_in', href: 'pod.php' },
+          { id: 'shipping-manifests', label: 'Shipment Manifests', icon: 'local_shipping', href: 'dtrs.php' },
+          { id: 'delivery-confirmation', label: 'Proof of Delivery (POD)', icon: 'assignment_turned_in', href: 'pod.php' },
           { id: 'document-repository', label: 'Document Repository', icon: 'folder_open', href: 'document_repository.php' },
           { id: 'track-documents', label: 'Track Documents', icon: 'markunread_mailbox', href: 'document_tracking.php' },
           { id: 'carrier-directory', label: 'Carrier / 3PL Directory', icon: 'commute', href: 'carriers.php' },
-          { id: 'customs-records', label: 'Customs & Compliance Records', icon: 'gavel', href: 'customs_records.php' }
+          { id: 'customs-records', label: 'Customs & Compliance', icon: 'gavel', href: 'customs_records.php' }
         ]
       },
 
