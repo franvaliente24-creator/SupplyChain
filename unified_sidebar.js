@@ -104,16 +104,6 @@ class UnifiedSidebar {
   }
 
   updateActiveState() {
-    // Update dashboard link
-    const dashboardLink = document.getElementById('sidebar-dashboard-link');
-    if (dashboardLink) {
-      const isDashboardActive = this.currentPath === 'dashboard.html' || this.currentPath === 'dashboard.php';
-      dashboardLink.classList.toggle('active', isDashboardActive);
-      dashboardLink.classList.toggle('bg-indigo-50', isDashboardActive);
-      dashboardLink.classList.toggle('text-indigo-700', isDashboardActive);
-      dashboardLink.classList.toggle('font-semibold', isDashboardActive);
-    }
-
     // Update module groups and subitems
     document.querySelectorAll('.sidebar-module-group').forEach(group => {
       const isOpen = this.isModuleOpenFromDOM(group);

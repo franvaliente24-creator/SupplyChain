@@ -3,17 +3,10 @@
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/csrf_config.php';
 require_once __DIR__ . '/rbac_config.php';
-requirePageAccess('orders');
 
-// Check authentication
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header("Location: index.html");
-    exit();
-}
-
-// Check session timeout
-if (!checkSessionTimeout()) {
-    header("Location: index.html");
+// Check permissions - allow access for roles that have orders.view permission
+if (!hasPermission('orders.view')) {
+    header('Location: dashboard.html?error=no_permission');
     exit();
 }
 

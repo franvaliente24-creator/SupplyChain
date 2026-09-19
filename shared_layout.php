@@ -64,12 +64,6 @@ $additional_head = $additional_head ?? '';
                 </div>
             </div>
 
-            <!-- Dashboard Link -->
-            <a id="sidebar-dashboard-link" class="sidebar-main-link flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-medium text-xs transition <?php echo ($current_page === 'dashboard.html' || $current_page === 'dashboard.php') ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''; ?>" href="dashboard.html?subsystem=supply-chain">
-                <span class="material-symbols-outlined text-indigo-600 text-[18px]">dashboard</span>
-                <span>Dashboard</span>
-            </a>
-
             <!-- Module Navigation Container -->
             <div id="sidebar-subsystem-nav-panel" class="sidebar-subsystem-nav-panel">
                 <nav id="sidebar-subsystem-modules-nav" class="sidebar-subsystem-modules"></nav>

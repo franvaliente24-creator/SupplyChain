@@ -245,7 +245,33 @@ function canAccessPage($page, $userRole = null) {
         'suppliers' => ['suppliers.view'],
         'suppliers_edit' => ['suppliers.edit'],
         'reports' => ['reports.view'],
-        'settings' => ['system.settings']
+        'settings' => ['system.settings'],
+        // Add additional pages that should be accessible
+        'item_master' => ['inventory.view'],
+        'stock_levels' => ['inventory.view'],
+        'utilization_overview' => ['inventory.view'],
+        'adjustments' => ['inventory.edit'],
+        'asset_disposition' => ['inventory.edit'],
+        'requisitions' => ['orders.view'],
+        'rfqs' => ['orders.view'],
+        'sourcing' => ['suppliers.view'],
+        'spend' => ['reports.view'],
+        'po_approvals' => ['orders.approve'],
+        'goods_receipt' => ['orders.view'],
+        'order_history' => ['orders.view'],
+        'po_scanner' => ['orders.view'],
+        'dtrs' => ['orders.view'],
+        'pod' => ['orders.view'],
+        'document_repository' => ['reports.view'],
+        'document_tracking' => ['orders.view'],
+        'carriers' => ['suppliers.view'],
+        'customs_records' => ['orders.view'],
+        'zone_map' => ['inventory.view'],
+        'bin_lookup' => ['inventory.view'],
+        'task_queues' => ['inventory.view'],
+        'cycle_count' => ['inventory.view'],
+        'activity_log' => ['system.logs'],
+        'login_history' => ['system.logs']
     ];
     
     $requiredPermissions = $pagePermissions[$page] ?? [];

@@ -3,7 +3,12 @@ require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/csrf_config.php';
 require_once __DIR__ . '/rbac_config.php';
 
-requirePageAccess('suppliers');
+// Check permissions - allow access for roles that have suppliers.view permission
+if (!hasPermission('suppliers.view')) {
+    header('Location: dashboard.html?error=no_permission');
+    exit();
+}
+
 requireCsrfProtection();
 
 require_once __DIR__ . '/svm_connection.php';
