@@ -30,15 +30,6 @@ const subsystemsData = {
       }
     ],
     modules: [
-      // Dashboard Module
-      {
-        id: 'dashboard',
-        name: 'Dashboard',
-        icon: 'dashboard',
-        subnav: [
-          { id: 'main-dashboard', label: 'Main Dashboard', icon: 'dashboard', href: 'dashboard.html' }
-        ]
-      },
 
       // 1. Smart Warehousing System (SWS)
       {

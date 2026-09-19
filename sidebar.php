@@ -9,7 +9,6 @@ $nav_groups = [
         "href" => "warehouse.php",
         "children" => [
             ["name" => "Warehouse Overview", "icon" => "warehouse", "href" => "warehouse.php"],
-            ["name" => "Zone Map", "icon" => "grid_view", "href" => "zone_map.php"],
             ["name" => "Bin Location Lookup", "icon" => "search", "href" => "bin_lookup.php"],
             ["name" => "Task Queues", "icon" => "assignment", "href" => "task_queues.php"],
             ["name" => "Cycle Count & Audit", "icon" => "checklist", "href" => "cycle_count.php"],
