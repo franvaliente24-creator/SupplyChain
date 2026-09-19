@@ -1,3 +1,4 @@
+
 /**
  * subsystems.js - Centralized Module & Navigation Registry
  */
@@ -36,10 +37,13 @@ const subsystemsData = {
         name: 'Smart Warehousing System (SWS)',
         icon: 'warehouse',
         subnav: [
+          { id: 'warehouse-overview', label: 'Warehouse Overview', icon: 'warehouse', href: 'warehouse.php' },
           { id: 'zone-map', label: 'Zone Map', icon: 'grid_view', href: 'zone_map.php' },
           { id: 'bin-lookup', label: 'Bin Lookup', icon: 'search', href: 'bin_lookup.php' },
           { id: 'task-queues', label: 'Task Queues', icon: 'assignment', href: 'task_queues.php' },
-          { id: 'cycle-count', label: 'Cycle Count', icon: 'checklist', href: 'cycle_count.php' }
+          { id: 'cycle-count', label: 'Cycle Count', icon: 'checklist', href: 'cycle_count.php' },
+          { id: 'tech-assets', label: 'Tech Assets', icon: 'devices', href: 'tech_assets.php' },
+          { id: 'asset-assignments', label: 'Equipment Matching', icon: 'assignment_ind', href: 'asset_assignments.php' }
         ]
       },
 
@@ -51,9 +55,10 @@ const subsystemsData = {
         subnav: [
           { id: 'item-master', label: 'Item Master', icon: 'inventory_2', href: 'item_master.php' },
           { id: 'stock-levels', label: 'Stock Levels', icon: 'bar_chart', href: 'stock_levels.php' },
+          { id: 'stock-requisitions', label: 'Stock Requisitions', icon: 'swap_horiz', href: 'stock_requisitions.php' },
           { id: 'utilization-overview', label: 'Utilization Overview', icon: 'pie_chart', href: 'utilization_overview.php' },
           { id: 'adjustments', label: 'Adjustments', icon: 'tune', href: 'adjustments.php' },
-          { id: 'asset-disposition', label: 'Asset Disposition', icon: 'swap_horiz', href: 'asset_disposition.php' }
+          { id: 'asset-disposition', label: 'Asset Disposition', icon: 'delete_sweep', href: 'asset_disposition.php' }
         ]
       },
 
@@ -65,7 +70,9 @@ const subsystemsData = {
         subnav: [
           { id: 'requisitions', label: 'Requisitions', icon: 'description', href: 'requisitions.php' },
           { id: 'rfqs', label: 'RFQs', icon: 'request_quote', href: 'rfqs.php' },
+          { id: 'rfp-management', label: 'RFP Management', icon: 'contract', href: 'rfp_management.php' },
           { id: 'sourcing', label: 'Sourcing', icon: 'handshake', href: 'sourcing.php' },
+          { id: 'procurement-templates', label: 'Document Templates', icon: 'file_copy', href: 'procurement_templates.php' },
           { id: 'spend', label: 'Spend Analysis', icon: 'payments', href: 'spend.php' }
         ]
       },
@@ -111,6 +118,18 @@ const subsystemsData = {
           { id: 'track-documents', label: 'Track Documents', icon: 'markunread_mailbox', href: 'document_tracking.php' },
           { id: 'carrier-directory', label: 'Carrier / 3PL Directory', icon: 'commute', href: 'carriers.php' },
           { id: 'customs-records', label: 'Customs & Compliance Records', icon: 'gavel', href: 'customs_records.php' }
+        ]
+      },
+
+      // 7. System Administration & Security
+      {
+        id: 'system-administration',
+        name: 'Administration & Security',
+        icon: 'admin_panel_settings',
+        subnav: [
+          { id: 'user-management', label: 'User Management', icon: 'manage_accounts', href: 'user_management.php' },
+          { id: 'login-history', label: 'Login History', icon: 'shield', href: 'login_history.php' },
+          { id: 'activity-log', label: 'Activity Audit Trail', icon: 'history', href: 'activity_log.php' }
         ]
       }
     ],
@@ -162,16 +181,6 @@ function getSubsystemById(id) {
   return subsystemsData[id] || subsystemsData['supply-chain'];
 }
 
-function getModuleById(subsystemId, moduleId) {
-  const subsystem = getSubsystemById(subsystemId);
-
-  if (!subsystem || !Array.isArray(subsystem.modules)) {
-    return null;
-  }
-
-  return subsystem.modules.find(mod => mod.id === moduleId) || null;
-}
-
 function normalizeModule(mod) {
   return {
     id: mod.id || '',
@@ -188,5 +197,3 @@ function getDashboardHref(subsystemId) {
 function getModuleHref(subsystemId, moduleId) {
   return `module.html?subsystem=${encodeURIComponent(subsystemId || 'supply-chain')}&module=${encodeURIComponent(moduleId)}`;
 }
-
-window.subsystemsData = subsystemsData;

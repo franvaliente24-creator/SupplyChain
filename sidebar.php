@@ -1,44 +1,50 @@
 <?php
-// sidebar.php - Synchronized Navigation Component
+// sidebar.php - Synchronized Enterprise Navigation
 $current_page = basename($_SERVER['PHP_SELF']);
 
 $nav_groups = [
     [
-        "name" => "Smart Warehousing System (SWS)",
+        "name" => "Smart Warehousing (SWS)",
         "icon" => "warehouse",
-        "href" => "zone_map.php",
+        "href" => "warehouse.php",
         "children" => [
+            ["name" => "Warehouse Overview", "icon" => "warehouse", "href" => "warehouse.php"],
             ["name" => "Zone Map", "icon" => "grid_view", "href" => "zone_map.php"],
-            ["name" => "Bin Lookup", "icon" => "search", "href" => "bin_lookup.php"],
+            ["name" => "Bin Location Lookup", "icon" => "search", "href" => "bin_lookup.php"],
             ["name" => "Task Queues", "icon" => "assignment", "href" => "task_queues.php"],
-            ["name" => "Cycle Count", "icon" => "checklist", "href" => "cycle_count.php"],
+            ["name" => "Cycle Count & Audit", "icon" => "checklist", "href" => "cycle_count.php"],
+            ["name" => "Tech Assets & Hardware", "icon" => "devices", "href" => "tech_assets.php"],
+            ["name" => "Equipment Matching", "icon" => "assignment_ind", "href" => "asset_assignments.php"],
         ]
     ],
     [
-        "name" => "Inventory Management System (IMS)",
+        "name" => "Inventory Management (IMS)",
         "icon" => "inventory_2",
         "href" => "item_master.php",
         "children" => [
-            ["name" => "Item Master", "icon" => "inventory_2", "href" => "item_master.php"],
-            ["name" => "Stock Levels", "icon" => "bar_chart", "href" => "stock_levels.php"],
+            ["name" => "Item Master Directory", "icon" => "inventory_2", "href" => "item_master.php"],
+            ["name" => "Stock Level Tracker", "icon" => "bar_chart", "href" => "stock_levels.php"],
+            ["name" => "Stock Requisitions", "icon" => "swap_horiz", "href" => "stock_requisitions.php"],
             ["name" => "Utilization Overview", "icon" => "pie_chart", "href" => "utilization_overview.php"],
-            ["name" => "Adjustments", "icon" => "tune", "href" => "adjustments.php"],
-            ["name" => "Asset Disposition", "icon" => "swap_horiz", "href" => "asset_disposition.php"],
+            ["name" => "Stock Adjustments", "icon" => "tune", "href" => "adjustments.php"],
+            ["name" => "Asset Disposition", "icon" => "delete_sweep", "href" => "asset_disposition.php"],
         ]
     ],
     [
-        "name" => "Procurement & Sourcing Management (PSM)",
+        "name" => "Procurement & Sourcing (PSM)",
         "icon" => "shopping_bag",
         "href" => "requisitions.php",
         "children" => [
-            ["name" => "Requisitions", "icon" => "description", "href" => "requisitions.php"],
-            ["name" => "RFQs", "icon" => "request_quote", "href" => "rfqs.php"],
-            ["name" => "Sourcing", "icon" => "handshake", "href" => "sourcing.php"],
+            ["name" => "Material Requisitions", "icon" => "description", "href" => "requisitions.php"],
+            ["name" => "RFQ Management", "icon" => "request_quote", "href" => "rfqs.php"],
+            ["name" => "RFP Management", "icon" => "contract", "href" => "rfp_management.php"],
+            ["name" => "Supplier Sourcing", "icon" => "handshake", "href" => "sourcing.php"],
+            ["name" => "Document Templates", "icon" => "file_copy", "href" => "procurement_templates.php"],
             ["name" => "Spend Analysis", "icon" => "payments", "href" => "spend.php"],
         ]
     ],
     [
-        "name" => "Supplier / Vendor Management",
+        "name" => "Supplier / Vendor (SVM)",
         "icon" => "handshake",
         "href" => "suppliers.php",
         "children" => [
@@ -51,7 +57,7 @@ $nav_groups = [
         ]
     ],
     [
-        "name" => "Purchase Order Management",
+        "name" => "Purchase Order (POM)",
         "icon" => "receipt_long",
         "href" => "orders.php",
         "children" => [
@@ -63,43 +69,54 @@ $nav_groups = [
         ]
     ],
     [
-        "name" => "Document Tracking & Logistics Records (DTRS)",
+        "name" => "Logistics & Records (DTRS)",
         "icon" => "local_shipping",
         "href" => "dtrs.php",
         "children" => [
-            ["name" => "Shipment Manifests & Tracking", "icon" => "local_shipping", "href" => "dtrs.php"],
-            ["name" => "Delivery Confirmation (POD)", "icon" => "assignment_turned_in", "href" => "pod.php"],
+            ["name" => "Shipment Manifests", "icon" => "local_shipping", "href" => "dtrs.php"],
+            ["name" => "Proof of Delivery (POD)", "icon" => "assignment_turned_in", "href" => "pod.php"],
             ["name" => "Document Repository", "icon" => "folder_open", "href" => "document_repository.php"],
             ["name" => "Track Documents", "icon" => "markunread_mailbox", "href" => "document_tracking.php"],
             ["name" => "Carrier / 3PL Directory", "icon" => "commute", "href" => "carriers.php"],
-            ["name" => "Customs & Compliance Records", "icon" => "gavel", "href" => "customs_records.php"],
+            ["name" => "Customs & Compliance", "icon" => "gavel", "href" => "customs_records.php"],
+        ]
+    ],
+    [
+        "name" => "Administration & Security",
+        "icon" => "admin_panel_settings",
+        "href" => "activity_log.php",
+        "children" => [
+            ["name" => "User Management", "icon" => "manage_accounts", "href" => "user_management.php"],
+            ["name" => "Login History", "icon" => "shield", "href" => "login_history.php"],
+            ["name" => "Activity Audit Trail", "icon" => "history", "href" => "activity_log.php"],
         ]
     ]
 ];
 ?>
 
-<!-- Mobile Overlay Backdrop -->
 <div id="sidebar-backdrop" class="fixed top-16 bottom-0 left-0 right-0 md:inset-0 bg-gray-900/50 backdrop-blur-md z-40 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
 
-<!-- Left Sidebar -->
 <aside id="app-sidebar" class="sidebar w-72 bg-surface border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 relative overflow-visible h-screen">
     <div id="sidebar-resize-handle" class="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/20 z-40"></div>
-    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
-        <div class="sidebar-brand-section">
-            <div class="sidebar-brand-card">
-                <div class="sidebar-brand-icon w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                    <img src="img/logo.png" alt="Supply Chain Logo" class="w-full h-full object-cover"/>
+    
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden p-3 space-y-1.5">
+        <div class="sidebar-brand-section mb-2">
+            <div class="sidebar-brand-card flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-xl">inventory_2</span>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="sidebar-brand-title font-bold text-xs text-slate-900 truncate">Supply Chain</div>
+                    <div class="sidebar-brand-subtitle text-[11px] text-slate-500 truncate">Management Console</div>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Link -->
-        <a id="sidebar-dashboard-link" class="sidebar-main-link flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-medium text-xs transition <?php echo ($current_page === 'dashboard.html' || $current_page === 'dashboard.php') ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''; ?>" href="dashboard.html?subsystem=supply-chain">
+        <a id="sidebar-dashboard-link" class="sidebar-main-link flex items-center gap-3 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-medium text-xs transition <?php echo in_array($current_page, ['dashboard.html', 'dashboard.php'], true) ? 'bg-indigo-50 text-indigo-700 font-semibold' : ''; ?>" href="dashboard.html?subsystem=supply-chain">
             <span class="material-symbols-outlined text-indigo-600 text-[18px]">dashboard</span>
             <span>Dashboard</span>
         </a>
 
-        <!-- Module Accordion Groups -->
         <div class="sidebar-subsystem-modules space-y-1 pt-2">
             <?php foreach ($nav_groups as $group): 
                 $child_hrefs = array_column($group['children'], 'href');
@@ -114,7 +131,7 @@ $nav_groups = [
                         <span class="material-symbols-outlined sidebar-chevron text-[16px] text-slate-400 transition-transform duration-200 <?php echo $is_open ? 'rotate-180' : ''; ?>">expand_more</span>
                     </button>
 
-                    <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="<?php echo $is_open ? 'max-height: 500px; display: block;' : 'max-height: 0px; display: none;'; ?>">
+                    <div class="sidebar-submenu pl-4 pr-1 py-1 space-y-1" style="<?php echo $is_open ? 'max-height: 500px;' : 'max-height: 0px;'; ?>">
                         <?php foreach ($group['children'] as $child): 
                             $is_active = ($current_page === $child['href']);
                         ?>
@@ -132,27 +149,26 @@ $nav_groups = [
 </aside>
 
 <script>
-document.querySelectorAll('.sidebar-module-toggle').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const parentGroup = btn.closest('.sidebar-module-group');
-        const chevron = btn.querySelector('.sidebar-chevron');
-        if (!parentGroup) return;
+// Scoped sidebar accordion logic
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.sidebar-module-toggle').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const parentGroup = btn.closest('.sidebar-module-group');
+            if (!parentGroup) return;
 
-        const isOpen = parentGroup.classList.toggle('open');
-        const submenu = parentGroup.querySelector('.sidebar-submenu');
-        
-        if (submenu) {
-            if (isOpen) {
-                submenu.style.display = 'block';
-                submenu.style.maxHeight = '500px';
-                if (chevron) chevron.classList.add('rotate-180');
-            } else {
-                submenu.style.maxHeight = '0px';
-                submenu.style.display = 'none';
-                if (chevron) chevron.classList.remove('rotate-180');
+            const isOpen = parentGroup.classList.toggle('open');
+            const chevron = btn.querySelector('.sidebar-chevron');
+            const submenu = parentGroup.querySelector('.sidebar-submenu');
+            
+            if (submenu) {
+                submenu.style.maxHeight = isOpen ? '500px' : '0px';
+                if (chevron) {
+                    chevron.classList.toggle('rotate-180', isOpen);
+                }
             }
-        }
+        };
     });
 });
 </script>
